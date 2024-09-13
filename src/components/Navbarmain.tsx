@@ -1,16 +1,14 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-import Cookies from 'js-cookie'; 
-
+import Cookies from 'js-cookie'; // Import Cookies for authentication token check
 import { UserPlus, Lock } from 'lucide-react';
 
 const Navbarmain: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-
+    // Check if the user is authenticated by looking for the auth token
     const token = Cookies.get("authToken");
     if (token) {
       setIsAuthenticated(true);
@@ -18,7 +16,7 @@ const Navbarmain: React.FC = () => {
   }, []);
 
   return (
-    <nav className="bg-sky-900 p-4 w-full">
+    <nav className="bg-sky-900  p-4 w-full">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="text-white text-4xl font-bold">
@@ -27,7 +25,7 @@ const Navbarmain: React.FC = () => {
 
         {/* Navigation Links */}
         <div className="flex items-center space-x-4 lg:space-x-8">
-     
+          {/* Mobile View: Show login icon only if not authenticated, register icon always */}
           <div className="flex items-center space-x-4 lg:hidden">
             {!isAuthenticated && (
               <Link href="/login" aria-label="Login">
@@ -35,25 +33,11 @@ const Navbarmain: React.FC = () => {
               </Link>
             )}
             <Link href="/register" aria-label="Register">
-              <UserPlus className="h-16 w-40 text-white hover:text-gray-300 transition-colors duration-200" />
-            </Link>
-          </div>
-
-
-          {/* Mobile View: Show login icon only if not authenticated, register icon always */}
-          <div className="flex items-center space-x-4 lg:hidden">
-            {!isAuthenticated && (
-              <Link href="/login" aria-label="Login">
-                <Lock size={25} className=" text-white hover:text-gray-300 transition-colors duration-200" />
-              </Link>
-            )}
-            <Link href="/register" aria-label="Register">
-              <UserPlus size={25} className=" text-white hover:text-gray-300 transition-colors duration-200" />
+              <UserPlus className="h-12 w-20 text-white hover:text-gray-300 transition-colors duration-200" />
             </Link>
           </div>
 
           {/* Desktop View: Show login button only if not authenticated, register button always */}
-
           <div className="hidden lg:flex lg:items-center lg:space-x-4">
             {!isAuthenticated && (
               <Link href="/login">
