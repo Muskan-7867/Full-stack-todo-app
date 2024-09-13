@@ -10,13 +10,14 @@ import Todos from "src/components/Todos";
 
 
 
+
 const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="p-4 mt-8 text-black">
        <Navbar />
         <Addtodo />
-        <Todos/>
+       <Todos
         
       </main>
     </div>
