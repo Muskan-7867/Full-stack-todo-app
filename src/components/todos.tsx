@@ -3,17 +3,16 @@
 import { useState, useEffect } from "react";
 
 
-import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline"; // Importing PencilIcon for editing
+import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline"; 
 
-import { useSearchParams } from "next/navigation"; //import useserachparam
-
+import { useSearchParams } from "next/navigation"; 
 type Todo = {
   _id: string;
   task: string;
   status: "pending" | "completed";
 };
 
-const Todos = () => {
+const todos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -59,7 +58,7 @@ const Todos = () => {
     return true; // For 'All' case or when no filter is applied
 
   });
-
+// delete function
   const handleDelete = async (id: string) => {
     try {
       const response = await fetch("/api/delete/todo", {
@@ -214,4 +213,4 @@ const Todos = () => {
   );
 };
 
-export default Todos;
+export default todos;
