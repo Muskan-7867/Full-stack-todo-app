@@ -29,7 +29,7 @@ const Navbarmain: React.FC = () => {
           <div className="flex items-center space-x-4 lg:hidden">
             {!isAuthenticated && (
               <Link href="/login" aria-label="Login">
-                <Lock className="h-6 w-6 text-white hover:text-gray-300 transition-colors duration-200" />
+                <Lock className="h-12 w-20 text-white hover:text-gray-300 transition-colors duration-200" />
               </Link>
             )}
             <Link href="/register" aria-label="Register">
