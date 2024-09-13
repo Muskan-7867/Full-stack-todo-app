@@ -17,17 +17,13 @@ const Navbar = () => {
       </Link>
       <Link
         href="/?todos=active"
-        className={`block md:inline ${
-          todosData === "active" ? "font-bold" : ""
-        } py-2 md:py-0`}
+        className={`block md:inline ${todosData === "active" ? "font-bold" : ""} py-2 md:py-0`}
       >
         Active
       </Link>
       <Link
         href="/?todos=completed"
-        className={`block md:inline ${
-          todosData === "completed" ? "font-bold" : ""
-        } py-2 md:py-0`}
+        className={`block md:inline ${todosData === "completed" ? "font-bold" : ""} py-2 md:py-0`}
       >
         Completed
       </Link>
