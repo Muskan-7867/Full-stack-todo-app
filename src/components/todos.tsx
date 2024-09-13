@@ -1,11 +1,11 @@
-"use client";
+"use client"; 
 
 import { useState, useEffect } from "react";
 
 
 import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline"; // Importing PencilIcon for editing
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation"; //import useserachparam
 
 type Todo = {
   _id: string;
