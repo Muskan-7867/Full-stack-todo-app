@@ -134,7 +134,7 @@ export default function Login() {
             <p className="mt-4 text-center text-green-500 text-sm">{message}</p>
           )}
           <p className="mt-6 text-center text-gray-600 text-[2em] md:text-[1.5em]">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-blue-600 hover:underline">
               Register
             </Link>
