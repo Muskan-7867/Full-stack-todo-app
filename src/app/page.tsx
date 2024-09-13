@@ -3,7 +3,7 @@ import React from "react";
 
 import Addtodo from "src/components/Addtodo";
 import Navbar from "src/components/Navbar";
-import Todos from "src/components/Todos";
+import Todos from "src/components/todos";
 
 
 
