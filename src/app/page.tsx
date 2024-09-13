@@ -3,7 +3,9 @@ import React from "react";
 
 import Addtodo from "src/components/Addtodo";
 import Navbar from "src/components/Navbar";
-import todos from "src/components/todos";
+import Todos from "src/components/Todos";
+
+
 
 
 
@@ -13,7 +15,7 @@ const Home: React.FC = () => {
       <main className="p-4 mt-8 text-black">
        <Navbar />
         <Addtodo />
-        <todos />
+        <Todos />
       </main>
     </div>
   );

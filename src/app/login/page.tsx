@@ -4,6 +4,7 @@ import Link from "next/link";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function Login() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUser((prevUser) => ({
       ...prevUser,
@@ -83,7 +84,7 @@ export default function Login() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-5xl md:text-4xl font-bold text-gray-800 mb-6 text-center md:text-center">
+          <h1 className="text-5xl md:text-4xl font-bold text-gray-800 mb-6 text-center">
             Login
           </h1>
           <div className="mb-4">
@@ -105,7 +106,7 @@ export default function Login() {
           </div>
           <div className="mb-6">
             <label
-              className="block text-gray-700 text-[2em] md:text-[1.5em] text-xl font-medium mb-2"
+              className="block text-gray-700 text-[2em] md:text-[1.5em] font-medium mb-2"
               htmlFor="password"
             >
               Password
@@ -134,10 +135,7 @@ export default function Login() {
           )}
           <p className="mt-6 text-center text-gray-600 text-[2em] md:text-[1.5em]">
             Don't have an account?{" "}
-            <Link
-              href="/register"
-              className="text-blue-600 hover:underline"
-            >
+            <Link href="/register" className="text-blue-600 hover:underline">
               Register
             </Link>
           </p>
@@ -150,10 +148,12 @@ export default function Login() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <img
+          <Image
             src="/login.svg"
             alt="Login illustration"
-            className="w-[350px] h-[350px] lg:w-[450px] lg:h-[450px]"
+            width={350}
+            height={350}
+            className="lg:w-[450px] lg:h-[450px]"
           />
         </motion.div>
       </motion.div>

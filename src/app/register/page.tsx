@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function Register() {
   const router = useRouter();
@@ -142,19 +143,21 @@ export default function Register() {
             </Link>
           </p>
         </motion.div>
-
-        {/* SVG Image Container */}
-        <div className="hidden md:flex justify-center items-center md:ml-[10%] lg:ml-[20%]">
-          <motion.img
+        <motion.div
+          className="hidden md:flex justify-center items-center md:ml-[10%] lg:ml-[15%]"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Image
             src="/signup.svg"
-            alt="Register illustration"
-            className="w-[350px] h-[350px] lg:w-[450px] lg:h-[450px]"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            alt="Login illustration"
+            width={350}
+            height={350}
+            className="lg:w-[450px] lg:h-[450px]"
           />
-        </div>
-      </motion.div>
+        </motion.div>
+        </motion.div>
     </div>
   );
 }

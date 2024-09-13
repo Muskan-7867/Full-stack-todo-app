@@ -12,7 +12,7 @@ type Todo = {
   status: "pending" | "completed";
 };
 
-const todos = () => {
+const Todos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -213,4 +213,4 @@ const todos = () => {
   );
 };
 
-export default todos;
+export default Todos;
