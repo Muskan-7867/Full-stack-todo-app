@@ -59,33 +59,37 @@ const Todos = () => {
 
   });
 // delete function
-  const handleDelete = async (id: string) => {
-    try {
-      const response = await fetch("/api/delete/todo", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
-      });
+const handleDelete = async (id: string) => {
+  // Optimistically update UI
+  setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
 
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
+  try {
+    const response = await fetch("/api/delete/todo", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
 
-        if (contentType && contentType.includes("application/json")) {
-          const result = await response.json();
-          throw new Error(result.message || "Failed to delete todo");
-        } else {
-          throw new Error("Unexpected response from the server.");
-        }
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type");
+
+      if (contentType && contentType.includes("application/json")) {
+        const result = await response.json();
+        throw new Error(result.message || "Failed to delete todo");
+      } else {
+        throw new Error("Unexpected response from the server.");
       }
-
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
-    } catch (error: any) {
-      console.error("Error deleting todo:", error);
-      setError(error.message || "An error occurred while deleting the todo.");
     }
-  };
+  } catch (error: any) {
+    console.error("Error deleting todo:", error);
+    // Optionally, you might want to re-fetch todos or revert the optimistic update
+    setTodos((prevTodos) => [...prevTodos, { _id: id, task: "", status: "pending" }]); // Or refetch
+    setError(error.message || "An error occurred while deleting the todo.");
+  }
+};
+
 // delete function
   const handleUpdate = async (id: string, updatedFields: Partial<Todo>) => {
     try {
