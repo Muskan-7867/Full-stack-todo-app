@@ -56,7 +56,7 @@ export default function Register() {
   };
 
   return (
-    <div className="flex justify-center md:justify-start items-center h-screen bg-gray-50 px-4">
+    <div className="flex justify-center md:justify-start items-center h-screen bg-gray-100 dark:bg-gray-300  px-4">
       <motion.div
         className="flex flex-col md:flex-row items-center w-full md:ml-[15%]"
         initial={{ opacity: 0, scale: 0.9 }}
@@ -70,7 +70,7 @@ export default function Register() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-5xl md:text-4xl font-bold text-gray-800 mb-6 text-center md:text-center">
+          <h1 className="text-5xl md:text-4xl font-bold text-sky-600  dark:text-sky-900 mb-6 text-center md:text-center">
             Register
           </h1>
           <div className="mb-4">
@@ -126,7 +126,7 @@ export default function Register() {
           </div>
           <button
             onClick={handleRegister}
-            className={`w-full bg-blue-500 text-[2em] md:text-[1.5em] text-white py-4 rounded hover:bg-blue-600 transition duration-200 ${
+            className={`w-full bg-blue-500  dark:bg-sky-900 text-[2em] md:text-[1.5em] text-white py-4 rounded hover:bg-blue-600 transition duration-200 ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={isLoading}
@@ -138,7 +138,7 @@ export default function Register() {
           )}
           <p className="mt-6 text-center text-[2em] md:text-[1.5em] text-gray-600">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <Link href="/login" className="text-blue-600  dark:text-sky-900 hover:underline">
               Login
             </Link>
           </p>
