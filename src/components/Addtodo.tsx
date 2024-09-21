@@ -71,9 +71,9 @@ const Addtodo = () => {
         <button
   type="submit"
   disabled={loading}
-  className={`p-2.5 px-6 sm:px-7 md:px-8 border-0 rounded-sm font-bold cursor-pointer mt-4 sm:mt-0 bg-sky-900 text-white transform transition duration-300 ${
+  className={`p-2.5 px-6 sm:px-7 md:px-8 border-0 rounded-sm font-bold cursor-pointer mt-4 sm:mt-0 bg-sky-600 dark:bg-sky-900 text-white transform transition duration-300 ${
     loading
-      ? "bg-blue-400 cursor-not-allowed"
+      ? "bg-blue-400  cursor-not-allowed"
       : "bg-green-600 hover:bg-sky-700 hover:scale-105 active:scale-95"
   }`}
 >
@@ -88,7 +88,7 @@ const Addtodo = () => {
         </p>
       )}
       {successMessage && (
-        <p className="mt-6 text-green-500 text-center text-2xl animate-fade-in">
+        <p className="mt-6 text-sky-500 dark:text-sky-900 text-center text-2xl animate-fade-in">
           {successMessage}
         </p>
       )}

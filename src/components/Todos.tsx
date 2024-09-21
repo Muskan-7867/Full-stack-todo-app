@@ -198,7 +198,7 @@ const handleDelete = async (id: string) => {
                 aria-label="Edit todo"
               >
 
-                <PencilIcon className="h-6 w-6 text-blue-500 hover:text-blue-700" />
+                <PencilIcon className="h-6 w-6 text-blue-900 dark:text-blue-500 hover:text-blue-700" />
 
               
               </button>
