@@ -8,7 +8,7 @@ import Todos from "src/components/Todos";
 const Home: React.FC = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-300">
         <main className="p-4 mt-8 text-black">
           <Navbar />
           <Addtodo />
