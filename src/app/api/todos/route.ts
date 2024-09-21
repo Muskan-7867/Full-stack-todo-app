@@ -1,13 +1,15 @@
-// api/todos/route.ts
 import { NextResponse } from "next/server";
 import Todo from "src/models/todomodel";
 import { connect } from "src/utills/db";
 
-connect();
+async function fetchTodos() {
+  await connect(); 
+  return await Todo.find();
+}
 
 export async function GET() {
   try {
-    const todos = await Todo.find(); // Fetch all todos
+    const todos = await fetchTodos();
     return NextResponse.json(
       { payload: todos, success: true },
       { status: 200 }
