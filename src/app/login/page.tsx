@@ -69,7 +69,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center md:justify-start items-center h-screen bg-gray-50 px-4">
+    <div className="flex justify-center md:justify-start items-center h-screen bg-gray-100 dark:bg-gray-300  px-4">
       {/* Main Container */}
       <motion.div
         className="flex flex-col md:flex-row items-center w-full md:ml-[15%]"
@@ -84,7 +84,7 @@ export default function Login() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-5xl md:text-4xl font-bold text-gray-800 mb-6 text-center">
+          <h1 className="text-5xl md:text-4xl font-bold text-sky-600  dark:text-sky-900  mb-6 text-center">
             Login
           </h1>
           <div className="mb-4">
@@ -123,7 +123,7 @@ export default function Login() {
           </div>
           <button
             onClick={handleLogin}
-            className={`w-full bg-blue-600 text-white py-3 text-[2em] md:text-[1.5em] rounded hover:bg-blue-700 transition duration-200 ${
+            className={`w-full bg-blue-500  dark:bg-sky-900 text-white py-3 text-[2em] md:text-[1.5em] rounded hover:bg-blue-700 transition duration-200 ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={isLoading}
@@ -135,7 +135,7 @@ export default function Login() {
           )}
           <p className="mt-6 text-center text-gray-600 text-[2em] md:text-[1.5em]">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-blue-600 hover:underline">
+            <Link href="/register" className="text-blue-600  dark:text-sky-900 hover:underline">
               Register
             </Link>
           </p>
