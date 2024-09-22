@@ -1,4 +1,4 @@
-"use client";  // Ensure this is at the top of the file
+"use client";  
 
 import React, { Suspense } from "react";
 import Addtodo from "src/components/Addtodo";
