@@ -5,8 +5,8 @@ export interface ITodo extends Document {
   task: string;
   status: 'inprogress' | 'pending' | 'completed';
   createdAt: Date;
-  userId: string; 
-  user: mongoose.Schema.Types.ObjectId;
+  user: string; 
+
 }
 
 // Define the Todo schema
@@ -26,10 +26,10 @@ const TodoSchema: MongooseSchema = new MongooseSchema(
       type: Date,
       default: Date.now,
     },
-    userid: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      
     },
   },
 
