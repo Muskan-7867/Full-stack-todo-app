@@ -1,15 +1,14 @@
-"use client"; 
+"use client";
 
 import { useState, useEffect } from "react";
-
-
 import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline"; 
-
 import { useSearchParams } from "next/navigation"; 
+
 type Todo = {
   _id: string;
   task: string;
   status: "pending" | "completed";
+  targetTime: string; // Keep targetTime as a string for easier handling
 };
 
 const Todos = () => {
@@ -17,6 +16,7 @@ const Todos = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTask, setEditingTask] = useState<string>("");
+  const [editingTargetTime, setEditingTargetTime] = useState<string>(""); // For editing target time
   const searchParams = useSearchParams();
   const filterStatus = searchParams.get("todos");
 
@@ -34,8 +34,18 @@ const Todos = () => {
         throw new Error("Invalid data structure received from the server.");
       }
 
-      setTodos(data.payload);
-    } catch (error: any) {
+      // Processing todos and checking for valid dates
+      const todosWithValidDates = data.payload.map(todo => {
+        const targetTime = new Date(todo.targetTime);
+        if (isNaN(targetTime.getTime())) {
+          console.error('Invalid Date for Todo:', todo);
+          return { ...todo, targetTime: new Date().toISOString() }; // Default to current date
+        }
+        return { ...todo, targetTime: targetTime.toISOString() }; // Ensure targetTime is ISO string
+      });
+
+      setTodos(todosWithValidDates);
+    } catch (error) {
       console.error("Error fetching todos:", error);
       setError(error.message || "An error occurred while fetching todos.");
     }
@@ -45,8 +55,6 @@ const Todos = () => {
     fetchTodos();
   }, []);
 
-
- 
   const filteredTodos = todos.filter((todo) => {
     if (filterStatus === "active") {
       return todo.status === "pending";
@@ -54,43 +62,38 @@ const Todos = () => {
     if (filterStatus === "completed") {
       return todo.status === "completed";
     }
-
     return true; // For 'All' case or when no filter is applied
-
   });
-// delete function
-const handleDelete = async (id: string) => {
-  // Optimistically update UI
-  setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
 
-  try {
-    const response = await fetch("/api/delete/todo", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id }),
-    });
+  const handleDelete = async (id: string) => {
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
 
-    if (!response.ok) {
-      const contentType = response.headers.get("content-type");
+    try {
+      const response = await fetch("/api/delete/todo", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
 
-      if (contentType && contentType.includes("application/json")) {
-        const result = await response.json();
-        throw new Error(result.message || "Failed to delete todo");
-      } else {
-        throw new Error("Unexpected response from the server.");
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          const result = await response.json();
+          throw new Error(result.message || "Failed to delete todo");
+        } else {
+          throw new Error("Unexpected response from the server.");
+        }
       }
+    } catch (error: any) {
+      console.error("Error deleting todo:", error);
+      setTodos((prevTodos) => [...prevTodos, { _id: id, task: "", status: "pending", targetTime: "" }]);
+      setError(error.message || "An error occurred while deleting the todo.");
     }
-  } catch (error: any) {
-    console.error("Error deleting todo:", error);
-    // Optionally, you might want to re-fetch todos or revert the optimistic update
-    setTodos((prevTodos) => [...prevTodos, { _id: id, task: "", status: "pending" }]); // Or refetch
-    setError(error.message || "An error occurred while deleting the todo.");
-  }
-};
+  };
 
-// delete function
   const handleUpdate = async (id: string, updatedFields: Partial<Todo>) => {
     try {
       const response = await fetch("/api/update/todo", {
@@ -120,6 +123,7 @@ const handleDelete = async (id: string) => {
 
       setEditingId(null);
       setEditingTask("");
+      setEditingTargetTime(""); // Reset the editing target time
     } catch (error: any) {
       console.error("Error updating todo:", error);
       setError(error.message || "An error occurred while updating the todo.");
@@ -131,14 +135,50 @@ const handleDelete = async (id: string) => {
     await handleUpdate(id, { status: newStatus });
   };
 
-  const handleEditClick = (id: string, currentTask: string) => {
+  const handleEditClick = (id: string, task: string, targetTime: string) => {
     setEditingId(id);
-    setEditingTask(currentTask);
+    setEditingTask(task);
+    setEditingTargetTime(targetTime); // Set editing target time
   };
 
   const handleEditComplete = async (id: string) => {
     if (editingTask.trim()) {
-      await handleUpdate(id, { task: editingTask });
+      await handleUpdate(id, { task: editingTask, targetTime: editingTargetTime }); // Include targetTime
+    }
+  };
+
+  const handleAddTodo = async (task: string) => {
+    const newTodo = {
+      task,
+      status: "pending",
+      targetTime: new Date().toISOString(), // Set targetTime to current time
+    };
+
+    try {
+      const response = await fetch("/api/add/todo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newTodo),
+      });
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          const result = await response.json();
+          throw new Error(result.message || "Failed to add todo");
+        } else {
+          throw new Error("Unexpected response from the server.");
+        }
+      }
+
+      // Fetch the updated list of todos
+      fetchTodos();
+    } catch (error: any) {
+      console.error("Error adding todo:", error);
+      setError(error.message || "An error occurred while adding the todo.");
     }
   };
 
@@ -149,9 +189,7 @@ const handleDelete = async (id: string) => {
         {filteredTodos.map((todo, index) => (
           <li
             key={todo._id}
-
             className={`flex items-center space-x-4 space-y-2 mx-12 border-b text-2xl border-black pb-4 transition-all duration-300 transform ${
-
               index !== todos.length - 1 ? "mb-4" : ""
             } ${todo.status === "completed" ? "opacity-50" : "opacity-100"}`}
           >
@@ -159,48 +197,45 @@ const handleDelete = async (id: string) => {
               type="checkbox"
               checked={todo.status === "completed"}
               onChange={(e) => handleStatusChange(todo._id, e.target.checked)}
-
               className="mr-4 mt-2 transform transition duration-200 hover:scale-110"
-              aria-label="Toggle status "
-
-            
+              aria-label="Toggle status"
             />
             {editingId === todo._id ? (
-              <input
-                type="text"
-                value={editingTask}
-                onChange={(e) => setEditingTask(e.target.value)}
-                onBlur={() => handleEditComplete(todo._id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleEditComplete(todo._id);
-                }}
-                autoFocus
-
-                className="w-full p-4 rounded-lg focus:outline-none focus:ring-2 transition transform duration-200 hover:scale-105"
-
-                
-              />
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={editingTask}
+                  onChange={(e) => setEditingTask(e.target.value)}
+                  onBlur={() => handleEditComplete(todo._id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleEditComplete(todo._id);
+                  }}
+                  autoFocus
+                  className="w-full p-4 rounded-lg focus:outline-none focus:ring-2 transition transform duration-200 hover:scale-105"
+                />
+                <input
+                  type="datetime-local"
+                  value={editingTargetTime}
+                  onChange={(e) => setEditingTargetTime(e.target.value)}
+                  className="p-4 rounded-lg focus:outline-none focus:ring-2 transition transform duration-200 hover:scale-105"
+                />
+              </div>
             ) : (
               <span
-                className={`flex-grow ${
-
-                  todo.status === "completed" ? "line-through" : ""
-     
-                }`}
+                className={`flex-grow ${todo.status === "completed" ? "line-through" : ""}`}
               >
-                {todo.task}
+                {todo.task} 
+                {/* Display the target time */}
+                <span className="text-gray-500"> (Due: {new Date(todo.targetTime).toLocaleString()})</span>
               </span>
             )}
             <div className="flex space-x-2">
               <button
-                onClick={() => handleEditClick(todo._id, todo.task)}
+                onClick={() => handleEditClick(todo._id, todo.task, todo.targetTime)}
                 className="p-2 rounded hover:bg-blue-100 transition duration-300 transform hover:scale-110"
                 aria-label="Edit todo"
               >
-
                 <PencilIcon className="h-6 w-6 text-blue-900 dark:text-blue-500 hover:text-blue-700" />
-
-              
               </button>
               <button
                 onClick={() => handleDelete(todo._id)}
