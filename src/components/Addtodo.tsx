@@ -1,20 +1,64 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+import { saveTodoToLocalStorage, getTodosFromLocalStorage, clearLocalStorageTodos } from "src/utills/localstorage"; // Import the utility functions
 
 type TodoForm = {
   task: string;
- 
 };
 
-const Addtodo = () => {
+// Function to check if the user is logged in using a cookie
+const getUserIsLoggedIn = () => {
+  const authCookie = Cookies.get("authToken"); // Assuming 'authToken' is the cookie name
+  return !!authCookie; // Returns true if the cookie exists, otherwise false
+};
+
+// Sync todos saved in local storage to the database when the user logs in
+const syncLocalTodosToDatabase = async () => {
+  const localTodos = getTodosFromLocalStorage(); // Retrieve locally stored todos
+
+  if (localTodos && localTodos.length > 0) {
+    try {
+      // Send each todo to the database
+      for (const todo of localTodos) {
+        const response = await fetch("/api/create/todo", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(todo), // Send each todo
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to sync local todo");
+        }
+      }
+
+      // Clear local todos after successful sync
+      clearLocalStorageTodos();
+      console.log("Todos synced successfully from local storage!");
+    } catch (error) {
+      console.error("Error syncing local todos:", error.message);
+    }
+  }
+};
+
+const AddTodo = () => {
   const [form, setForm] = useState<TodoForm>({
     task: "",
-    
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Sync local todos when the component mounts if the user is logged in
+  useEffect(() => {
+    if (getUserIsLoggedIn()) {
+      syncLocalTodosToDatabase(); // Sync local todos to the database
+    }
+  }, []); // Empty dependency array ensures this runs once on component mount
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,22 +71,31 @@ const Addtodo = () => {
     setSuccessMessage(null);
 
     try {
-      const response = await fetch("/api/create/todo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
+      // Use getUserIsLoggedIn to determine if user is logged in
+      if (!getUserIsLoggedIn()) {
+        // Save locally if user is not logged in
+        saveTodoToLocalStorage({ task: form.task, status: "pending" });
+        setSuccessMessage("Todo saved locally! Will sync when you log in.");
+      } else {
+        // User is logged in, save to the database
+        const response = await fetch("/api/create/todo", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create Todo");
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to create Todo");
+        }
+
+        setSuccessMessage("Todo created successfully in the database!");
       }
 
-      setSuccessMessage("Todo created successfully!");
-      setForm({ task: "" }); 
+      setForm({ task: "" });
     } catch (error: any) {
       setError(error.message || "Something went wrong.");
     } finally {
@@ -54,32 +107,29 @@ const Addtodo = () => {
     <div className="w-full max-w-4xl mx-auto p-8 rounded-lg">
       <form onSubmit={handleSubmit} className="flex items-center space-x-4">
         <div className="flex-grow">
-        <input
-  type="text"
-  id="task"
-  name="task"
-  value={form.task}
-  onChange={handleChange}
-  required
-  placeholder="Enter your task"
-  className="border border-gray-400 rounded-sm w-full md:w-[42rem] lg:w-[42rem] my-4 sm:my-6 md:my-8 p-2 px-4 text-lg sm:text-xl tracking-wide font-bold transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
-
+          <input
+            type="text"
+            id="task"
+            name="task"
+            value={form.task}
+            onChange={handleChange}
+            required
+            placeholder="Enter your task"
+            className="border border-gray-400 rounded-sm w-full md:w-[42rem] lg:w-[42rem] my-4 sm:my-6 md:my-8 p-2 px-4 text-lg sm:text-xl tracking-wide font-bold transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-       
 
         <button
-  type="submit"
-  disabled={loading}
-  className={`p-2.5 px-6 sm:px-7 md:px-8 border-0 rounded-sm font-bold cursor-pointer mt-4 sm:mt-0 bg-sky-600 dark:bg-sky-900 text-white transform transition duration-300 ${
-    loading
-      ? "bg-blue-400  cursor-not-allowed"
-      : "bg-green-600 hover:bg-sky-700 hover:scale-105 active:scale-95"
-  }`}
->
-  {loading ? "Creating..." : "Add Todo"}
-</button>
-
+          type="submit"
+          disabled={loading}
+          className={`p-2.5 px-6 sm:px-7 md:px-8 border-0 rounded-sm font-bold cursor-pointer mt-4 sm:mt-0 bg-sky-600 dark:bg-sky-900 text-white transform transition duration-300 ${
+            loading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-sky-700 hover:scale-105 active:scale-95"
+          }`}
+        >
+          {loading ? "Creating..." : "Add Todo"}
+        </button>
       </form>
 
       {error && (
@@ -97,4 +147,4 @@ const Addtodo = () => {
   );
 };
 
-export default Addtodo;
+export default AddTodo;
