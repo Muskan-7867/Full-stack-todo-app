@@ -5,8 +5,8 @@ export interface ITodo extends Document {
   task: string;
   status: 'inprogress' | 'pending' | 'completed';
   createdAt: Date;
+  targetTime: Date; // Add targetTime to the interface
   user: string; 
-
 }
 
 // Define the Todo schema
@@ -26,13 +26,15 @@ const TodoSchema: MongooseSchema = new MongooseSchema(
       type: Date,
       default: Date.now,
     },
+    targetTime: {
+      type: Date,
+      required: true,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      
     },
-  },
-
+  }
 );
 
 // Use existing model if available or create a new one
