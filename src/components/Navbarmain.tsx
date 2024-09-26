@@ -20,7 +20,7 @@ const Navbarmain: React.FC = () => {
     }
   }, []);
 
-  // Logout function to clear the authentication token and update state
+
   const handleLogout = () => {
     Cookies.remove("authToken"); 
     setIsAuthenticated(false); 
@@ -61,24 +61,26 @@ const Navbarmain: React.FC = () => {
             {!isAuthenticated ? (
               <Link href="/login">
                 <button className="bg-white  dark:bg-gray-600 text-gray-700 dark:text-white text-xl px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
-                  Login
+                <Lock className="inline-block mr-2 h-6 w-10" />
+                Login
                 </button>
               </Link>
             ) : (
-              <button
-                onClick={handleLogout}
-                className="bg-white text-black dark:bg-gray-600 text-xl dark:text-white px-6 py-2 rounded-full hover:bg-red-500 dark:hover:bg-red-700 transition-colors duration-200"
-              >
-                <LogOut className="inline-block mr-2" />
-                Logout
-              </button>
-            )}
-
-            <Link href="/register">
+              <Link href="/register">
               <button className="bg-white text-black dark:bg-gray-600 text-xl dark:text-white px-6 py-2 rounded-full transition-colors duration-200">
+              <UserPlus className="inline-block mr-2 h-6 w-10" />
                 Register
               </button>
-            </Link>
+              </Link>
+            )}
+            <button
+                onClick={handleLogout}
+                className="bg-white text-black dark:bg-gray-600 text-xl dark:text-white px-6 py-2 rounded-full  transition-colors duration-200"
+              >
+                <LogOut className="inline-block mr-2 h-6 w-10" />
+                Logout
+              </button>
+           
           </div>
         </div>
       </div>

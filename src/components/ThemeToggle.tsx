@@ -1,4 +1,4 @@
-"use client"; // Ensure this is a client-side component
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react"; 
@@ -7,13 +7,12 @@ const ThemeToggle: React.FC = () => {
   const [theme, setTheme] = useState<string>("light");
 
   useEffect(() => {
-    // On mount, check for saved theme in localStorage or system preference
+ 
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
       setTheme(savedTheme);
       applyTheme(savedTheme);
     } else {
-      // If no saved theme, check system preference
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       const initialTheme = prefersDark ? "dark" : "light";
       setTheme(initialTheme);
@@ -22,7 +21,7 @@ const ThemeToggle: React.FC = () => {
   }, []);
 
   const applyTheme = (currentTheme: string) => {
-    const root = document.documentElement; // <html> element
+    const root = document.documentElement; 
     if (currentTheme === "dark") {
       root.classList.add("dark");
     } else {

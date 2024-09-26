@@ -6,13 +6,13 @@ type TodoForm = {
   task: string;
 };
 
-// Function to check if the user is logged in using a cookie
+
 const getUserIsLoggedIn = () => {
   const authCookie = Cookies.get("authToken"); // Assuming 'authToken' is the cookie name
   return !!authCookie; // Returns true if the cookie exists, otherwise false
 };
 
-// Sync todos saved in local storage to the database when the user logs in
+
 const syncLocalTodosToDatabase = async () => {
   const localTodos = getTodosFromLocalStorage(); // Retrieve locally stored todos
 
@@ -35,7 +35,7 @@ const syncLocalTodosToDatabase = async () => {
         }
       }
 
-      // Clear local todos after successful sync
+      
       clearLocalStorageTodos();
       console.log("Todos synced successfully from local storage!");
     } catch (error) {
@@ -53,12 +53,11 @@ const AddTodo = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Sync local todos when the component mounts if the user is logged in
   useEffect(() => {
     if (getUserIsLoggedIn()) {
-      syncLocalTodosToDatabase(); // Sync local todos to the database
+      syncLocalTodosToDatabase(); 
     }
-  }, []); // Empty dependency array ensures this runs once on component mount
+  }, []); 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -71,13 +70,13 @@ const AddTodo = () => {
     setSuccessMessage(null);
 
     try {
-      // Use getUserIsLoggedIn to determine if user is logged in
+     
       if (!getUserIsLoggedIn()) {
-        // Save locally if user is not logged in
+        
         saveTodoToLocalStorage({ task: form.task, status: "pending" });
         setSuccessMessage("Todo saved locally! Will sync when you log in.");
       } else {
-        // User is logged in, save to the database
+       
         const response = await fetch("/api/create/todo", {
           method: "POST",
           headers: {
