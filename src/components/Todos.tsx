@@ -1,30 +1,44 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline"; 
-import { useSearchParams } from "next/navigation"; 
+import { useSearchParams } from "next/navigation";
+import { useCurrentUser } from "src/hooks/useCurrentUser";
+import { PencilIcon } from "@heroicons/react/24/solid";
+import TodoDelete from "./TodoDelete";
+import TodoUpdate from "./TodoUpdate";
 
 type Todo = {
   _id: string;
   task: string;
   status: "pending" | "completed";
-  targetTime: string; // Keep targetTime as a string for easier handling
+  targetTime: string;
 };
 
 const Todos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingTask, setEditingTask] = useState<string>("");
-  const [editingTargetTime, setEditingTargetTime] = useState<string>(""); // For editing target time
+  const { user } = useCurrentUser();
+
   const searchParams = useSearchParams();
   const filterStatus = searchParams.get("todos");
 
   const fetchTodos = async () => {
+    if (!user?.userId) {
+      setError("User ID is required to fetch todos.");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const response = await fetch("/api/todos", { method: "GET" });
-      const text = await response.text();
-      const data = text ? JSON.parse(text) : { payload: [] };
+      const response = await fetch("/api/todos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ _id: user.userId }),
+      });
+
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to fetch todos");
@@ -34,216 +48,131 @@ const Todos = () => {
         throw new Error("Invalid data structure received from the server.");
       }
 
-      // Processing todos and checking for valid dates
-      const todosWithValidDates = data.payload.map(todo => {
+      const todosWithValidDates = data.payload.map((todo: Todo) => {
         const targetTime = new Date(todo.targetTime);
         if (isNaN(targetTime.getTime())) {
-          console.error('Invalid Date for Todo:', todo);
-          return { ...todo, targetTime: new Date().toISOString() }; // Default to current date
+          console.error("Invalid Date for Todo:", todo);
+          return { ...todo, targetTime: new Date().toISOString() };
         }
-        return { ...todo, targetTime: targetTime.toISOString() }; // Ensure targetTime is ISO string
+        return { ...todo, targetTime: targetTime.toISOString() };
       });
 
       setTodos(todosWithValidDates);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching todos:", error);
       setError(error.message || "An error occurred while fetching todos.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTodos();
-  }, []);
-
-  const filteredTodos = todos.filter((todo) => {
-    if (filterStatus === "active") {
-      return todo.status === "pending";
+    if (user?.userId) {
+      fetchTodos();
     }
-    if (filterStatus === "completed") {
-      return todo.status === "completed";
-    }
-    return true; // For 'All' case or when no filter is applied
-  });
+  }, [user]);
 
-  const handleDelete = async (id: string) => {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
-
+  const handleStatusChange = async (id: string, isChecked: boolean) => {
     try {
-      const response = await fetch("/api/delete/todo", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
-      });
-
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-
-        if (contentType && contentType.includes("application/json")) {
-          const result = await response.json();
-          throw new Error(result.message || "Failed to delete todo");
-        } else {
-          throw new Error("Unexpected response from the server.");
-        }
-      }
-    } catch (error: any) {
-      console.error("Error deleting todo:", error);
-      setTodos((prevTodos) => [...prevTodos, { _id: id, task: "", status: "pending", targetTime: "" }]);
-      setError(error.message || "An error occurred while deleting the todo.");
-    }
-  };
-
-  const handleUpdate = async (id: string, updatedFields: Partial<Todo>) => {
-    try {
+      const updatedStatus = isChecked ? "completed" : "pending"; // Determine new status
       const response = await fetch("/api/update/todo", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id, ...updatedFields }),
+        body: JSON.stringify({ id, status: updatedStatus }),
       });
 
       if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-
-        if (contentType && contentType.includes("application/json")) {
-          const result = await response.json();
-          throw new Error(result.message || "Failed to update todo");
-        } else {
-          throw new Error("Unexpected response from the server.");
-        }
+        const result = await response.json();
+        throw new Error(result.message || "Failed to update todo status");
       }
 
+      // Update local state after successful API response
       setTodos((prevTodos) =>
         prevTodos.map((todo) =>
-          todo._id === id ? { ...todo, ...updatedFields } : todo
+          todo._id === id ? { ...todo, status: updatedStatus } : todo
         )
       );
-
-      setEditingId(null);
-      setEditingTask("");
-      setEditingTargetTime(""); // Reset the editing target time
     } catch (error: any) {
-      console.error("Error updating todo:", error);
-      setError(error.message || "An error occurred while updating the todo.");
+      console.error("Error updating todo status:", error);
+      setError(error.message || "An error occurred while updating todo status.");
     }
   };
 
-  const handleStatusChange = async (id: string, checked: boolean) => {
-    const newStatus = checked ? "completed" : "pending";
-    await handleUpdate(id, { status: newStatus });
+  const handleEditClick = (id: string) => {
+    setEditingId(id); // Track the todo being edited
   };
 
-  const handleEditClick = (id: string, task: string, targetTime: string) => {
-    setEditingId(id);
-    setEditingTask(task);
-    setEditingTargetTime(targetTime); // Set editing target time
+  const handleUpdateComplete = (id: string, updatedTask: string) => {
+    // Update the todo after editing is done
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo._id === id ? { ...todo, task: updatedTask } : todo
+      )
+    );
+    setEditingId(null); // Stop editing mode
   };
 
-  const handleEditComplete = async (id: string) => {
-    if (editingTask.trim()) {
-      await handleUpdate(id, { task: editingTask, targetTime: editingTargetTime }); // Include targetTime
-    }
-  };
-
-  const handleAddTodo = async (task: string) => {
-    const newTodo = {
-      task,
-      status: "pending",
-      targetTime: new Date().toISOString(), // Set targetTime to current time
-    };
-
-    try {
-      const response = await fetch("/api/add/todo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newTodo),
-      });
-
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-
-        if (contentType && contentType.includes("application/json")) {
-          const result = await response.json();
-          throw new Error(result.message || "Failed to add todo");
-        } else {
-          throw new Error("Unexpected response from the server.");
-        }
-      }
-
-      // Fetch the updated list of todos
-      fetchTodos();
-    } catch (error: any) {
-      console.error("Error adding todo:", error);
-      setError(error.message || "An error occurred while adding the todo.");
-    }
-  };
+  const filteredTodos = todos.filter((todo) => {
+    if (filterStatus === "active") return todo.status === "pending";
+    if (filterStatus === "completed") return todo.status === "completed";
+    return true;
+  });
 
   return (
     <div className="w-full max-w-4xl mx-auto p-8 rounded-lg">
+      {loading && <p>Loading todos...</p>}
       {error && <p className="text-red-500 font-medium">{error}</p>}
       <ul className="space-y-4">
         {filteredTodos.map((todo, index) => (
           <li
             key={todo._id}
-            className={`flex items-center space-x-4 space-y-2 mx-12 border-b text-2xl border-black pb-4 transition-all duration-300 transform ${
+            className={`flex items-center space-x-4 border-b text-2xl border-black pb-4 transition-all duration-300 transform ${
               index !== todos.length - 1 ? "mb-4" : ""
             } ${todo.status === "completed" ? "opacity-50" : "opacity-100"}`}
           >
             <input
               type="checkbox"
               checked={todo.status === "completed"}
-              onChange={(e) => handleStatusChange(todo._id, e.target.checked)}
+              onChange={(e) => handleStatusChange(todo._id, e.target.checked)} // Update status on checkbox change
               className="mr-4 mt-2 transform transition duration-200 hover:scale-110"
               aria-label="Toggle status"
             />
+
             {editingId === todo._id ? (
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={editingTask}
-                  onChange={(e) => setEditingTask(e.target.value)}
-                  onBlur={() => handleEditComplete(todo._id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleEditComplete(todo._id);
-                  }}
-                  autoFocus
-                  className="w-full p-4 rounded-lg focus:outline-none focus:ring-2 transition transform duration-200 hover:scale-105"
-                />
-                <input
-                  type="datetime-local"
-                  value={editingTargetTime}
-                  onChange={(e) => setEditingTargetTime(e.target.value)}
-                  className="p-4 rounded-lg focus:outline-none focus:ring-2 transition transform duration-200 hover:scale-105"
-                />
-              </div>
+              <TodoUpdate
+                todoId={todo._id}
+                task={todo.task}
+                targetTime={todo.targetTime}
+                status={todo.status}
+                setTodos={setTodos}
+                onComplete={handleUpdateComplete} // Pass the completion handler
+              />
             ) : (
               <span
-                className={`flex-grow ${todo.status === "completed" ? "line-through" : ""}`}
+                className={`flex-grow ${
+                  todo.status === "completed" ? "line-through" : ""
+                }`}
               >
-                {todo.task} 
-                {/* Display the target time */}
-                <span className="text-gray-500"> (Due: {new Date(todo.targetTime).toLocaleString()})</span>
+                {todo.task}
+                <span className="text-gray-500">
+                  {" "}
+                  (Due: {new Date(todo.targetTime).toLocaleString()})
+                </span>
               </span>
             )}
+
             <div className="flex space-x-2">
               <button
-                onClick={() => handleEditClick(todo._id, todo.task, todo.targetTime)}
-                className="p-2 rounded hover:bg-blue-100 transition duration-300 transform hover:scale-110"
+                onClick={() => handleEditClick(todo._id)}
+                className="p-2 rounded hover:bg-blue-100"
                 aria-label="Edit todo"
               >
                 <PencilIcon className="h-6 w-6 text-blue-900 dark:text-blue-500 hover:text-blue-700" />
               </button>
-              <button
-                onClick={() => handleDelete(todo._id)}
-                className="p-2 rounded hover:bg-red-100 transition duration-300 transform hover:scale-110"
-                aria-label="Delete todo"
-              >
-                <TrashIcon className="h-6 w-6 text-red-500 hover:text-red-700" />
-              </button>
+
+              <TodoDelete todoId={todo._id} setTodos={setTodos} />
             </div>
           </li>
         ))}
