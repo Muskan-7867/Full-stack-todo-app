@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-// next.config.js
-module.exports = {
+const nextConfig = {
     env: {
-      RESEND_API_KEY: process.env.RESEND_API_KEY,
+      RESEND_API_KEY: process.env.RESEND_API_KEY, 
     },
   };
   
-export default nextConfig;
+  export default nextConfig;
+  
