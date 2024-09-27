@@ -15,7 +15,7 @@ export default function Register() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUser((prevUser) => ({
       ...prevUser,
@@ -40,7 +40,23 @@ export default function Register() {
         const data = await response.json();
 
         if (response.ok) {
-          setMessage("Registration successful! You can now log in.");
+          // After successful registration, send the welcome email
+          const emailResponse = await fetch("/api/send-email", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: user.email }),
+          });
+
+          const emailData = await emailResponse.json();
+
+          if (emailResponse.ok) {
+            setMessage("Registration successful! Welcome email sent. You can now log in.");
+          } else {
+            setMessage("Registration successful! But email sending failed.");
+          }
+
           router.push("/login");
         } else {
           setMessage(data.error || "Registration failed. Please try again.");
@@ -157,7 +173,7 @@ export default function Register() {
             className="lg:w-[450px] lg:h-[450px]"
           />
         </motion.div>
-        </motion.div>
+      </motion.div>
     </div>
   );
 }
