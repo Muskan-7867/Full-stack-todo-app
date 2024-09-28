@@ -1,5 +1,21 @@
 import mongoose, { Document, Schema as MongooseSchema } from 'mongoose';
 
+export interface Message extends Document {
+  content: string;
+  createdAt: Date;
+}
+
+const MessageSchema: MongooseSchema<Message> = new mongoose.Schema({
+  content: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
+});
 
 export interface IUser extends Document {
   username: string;
@@ -7,8 +23,6 @@ export interface IUser extends Document {
   password: string;
   todos: mongoose.Schema.Types.ObjectId[];
 }
-
-
 const UserSchema: MongooseSchema = new MongooseSchema(
   {
     username: {
@@ -29,6 +43,7 @@ const UserSchema: MongooseSchema = new MongooseSchema(
       required: [true, "Can't be blank"],
       trim: true
     },
+    
     todos: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -36,12 +51,26 @@ const UserSchema: MongooseSchema = new MongooseSchema(
         default : []
         
       }
-    ]
+      ],
+    verifyCode: {
+      type: String,
+      required: [true, 'Verify Code is required'],
+    },
+    verifyCodeExpiry: {
+      type: Date,
+      required: [true, 'Verify Code Expiry is required'],
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isAcceptingMessages: {
+      type: Boolean,
+      default: true,
+    },
+    messages: [MessageSchema],
   }
   
 );
-
-
-
 const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 export default User;
