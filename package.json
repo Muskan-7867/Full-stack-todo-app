@@ -11,6 +11,7 @@
   "dependencies": {
     "@heroicons/react": "^2.1.5",
     "@react-email/components": "^0.0.25",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "framer-motion": "^11.5.4",
@@ -22,6 +23,7 @@
     "mongoose": "^8.5.2",
     "moongoose": "^0.0.5",
     "next": "14.2.5",
+    "next-auth": "^4.24.8",
     "react": "^18",
     "react-dom": "^18",
     "react-email": "^3.0.1",
