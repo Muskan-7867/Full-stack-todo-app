@@ -14,7 +14,9 @@ export default function Register() {
   const handleChange = (e) => setUser({ ...user, [e.target.name]: e.target.value });
 
   const handleRegister = async () => {
-    if (!user.username || !user.email || !user.password) return setMessage("Please fill in all fields.");
+    if (!user.username || !user.email || !user.password) {
+      return setMessage("Please fill in all fields.");
+    }
     setIsLoading(true);
     setMessage("");
 
@@ -27,13 +29,8 @@ export default function Register() {
 
       const data = await response.json();
       if (response.ok) {
-        const emailResponse = await fetch("/api/send-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: user.email }),
-        });
-        setMessage(emailResponse.ok ? "Registration successful! Welcome email sent." : "Registration successful! But email sending failed.");
-        router.push("/login");
+        setMessage("Registration successful! Please verify your email");
+        // router.push("/login");
       } else {
         setMessage(data.error || "Registration failed. Please try again.");
       }
@@ -64,8 +61,13 @@ export default function Register() {
               <label htmlFor={field} className="block text-gray-700 text-[2em] md:text-[1.5em] font-medium mb-2">
                 {field.charAt(0).toUpperCase() + field.slice(1)}
               </label>
-              <input id={field} name={field} type={field === "password" ? "password" : "text"} placeholder={`Enter your ${field}`}
-                value={user[field]} onChange={handleChange}
+              <input
+                id={field}
+                name={field}
+                type={field === "password" ? "password" : "text"}
+                placeholder={`Enter your ${field}`}
+                value={user[field]}
+                onChange={handleChange}
                 className="w-full p-4 border text-[2em] md:text-[1.5em] border-gray-300 rounded focus:outline-none focus:border-blue-500"
               />
             </div>
