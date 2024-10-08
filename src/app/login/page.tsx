@@ -5,6 +5,9 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { PulseLoader } from 'react-spinners';
+
+
 
 export default function Login() {
   const router = useRouter();
@@ -61,7 +64,7 @@ export default function Login() {
             <input id="password" name="password" type="password" placeholder="Enter your password" value={user.password} onChange={handleChange} className="w-full p-4 border text-[2em] md:text-[1.5em] border-gray-300 rounded focus:outline-none focus:border-blue-500" />
           </div>
           <button onClick={handleLogin} className={`w-full bg-blue-500 dark:bg-sky-900 text-white py-3 text-[2em] md:text-[1.5em] rounded hover:bg-blue-700 transition duration-200 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={isLoading}>
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading ? <PulseLoader color="#fff" size={10} /> : "Login"}
           </button>
           {message && <p className="mt-4 text-center text-green-500 text-sm">{message}</p>}
           <p className="mt-6 text-center text-gray-600 text-[2em] md:text-[1.5em]">Don&apos;t have an account?{" "}

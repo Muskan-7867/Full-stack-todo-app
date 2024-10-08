@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { PulseLoader } from "react-spinners";
 
 export default function Register() {
   const router = useRouter();
@@ -79,7 +80,7 @@ export default function Register() {
             }`}
             disabled={isLoading}
           >
-            {isLoading ? "Registering..." : "Register"}
+            {isLoading ? <PulseLoader color="#fff" size={10} /> : "Register"}
           </button>
           {message && <p className="mt-4 text-center text-green-500 text-lg">{message}</p>}
           <p className="mt-6 text-center text-xl text-gray-600">
