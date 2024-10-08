@@ -37,7 +37,7 @@ const VerificationEmail: React.FC<VerificationEmailProps> = ({
           fontStyle="normal"
         />
       </Head>
-      <Preview>Here&apos;s your verification code: {otp}</Preview> {/* Changed here */}
+      <Preview>Here your verification code: {otp}</Preview>
       <Container className="p-5 bg-gray-100">
         <Section className="bg-white p-5 rounded-lg">
           <Row>
