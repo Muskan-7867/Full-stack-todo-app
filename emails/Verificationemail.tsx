@@ -16,9 +16,11 @@ interface VerificationEmailProps {
   otp: string;
 }
 
-const VerificationEmail: React.FC<VerificationEmailProps> = ({ username, otp }) => {
+const VerificationEmail: React.FC<VerificationEmailProps> = ({
+  username,
+  otp,
+}) => {
   // Create a verification link that directs to the verification page
-  const verificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL}api/verifyemail?otp=${otp}`;
 
   return (
     <Html lang="en" dir="ltr">
@@ -45,7 +47,8 @@ const VerificationEmail: React.FC<VerificationEmailProps> = ({ username, otp }) 
           </Row>
           <Row>
             <Text className="text-base mb-3">
-              Thank you for registering. Please use the following verification code to complete your registration:
+              Thank you for registering. Please use the following verification
+              code to complete your registration:
             </Text>
           </Row>
           <Row>
@@ -57,10 +60,7 @@ const VerificationEmail: React.FC<VerificationEmailProps> = ({ username, otp }) 
             </Text>
           </Row>
           <Row className="text-center mb-5">
-            <Button
-              className="bg-black text-white no-underline font-bold rounded px-6 py-3 inline-block"
-              href={verificationUrl}
-            >
+            <Button className="bg-black text-white no-underline font-bold rounded px-6 py-3 inline-block">
               Verify Your Email
             </Button>
           </Row>
