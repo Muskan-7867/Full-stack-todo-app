@@ -1,16 +1,17 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { PulseLoader } from "react-spinners";
+import { PulseLoader, HashLoader } from "react-spinners";
 
 export default function Register() {
   const router = useRouter();
   const [user, setUser] = useState({ username: "", email: "", password: "" });
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true); // Page loading state
 
   const handleChange = (e) => setUser({ ...user, [e.target.name]: e.target.value });
 
@@ -41,6 +42,22 @@ export default function Register() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Simulate page loading delay
+    setTimeout(() => {
+      setPageLoading(false); // Set page as loaded after delay
+    }, 1000); // Adjust delay as needed
+  }, []);
+
+  // Show HashLoader while the page is loading
+  if (pageLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-300">
+        <HashLoader color="#36d7b7" size={30} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center md:justify-start items-center h-screen bg-gray-100 dark:bg-gray-300 px-4">
