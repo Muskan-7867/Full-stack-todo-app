@@ -26,7 +26,7 @@ export async function POST(request) {
         await existingUser.save(); // Save updated user data
 
         // Send verification email
-        await SendVerificationEmail([email], username, verifyCode);
+        await SendVerificationEmail(email, username, verifyCode);
 
         
         return NextResponse.json(
