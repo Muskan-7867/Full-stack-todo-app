@@ -10,85 +10,70 @@ export async function POST(request) {
     const { username, email, password } = await request.json();
     console.log("Request Body:", { username, email, password });
 
+    // Generate verification code
+    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
 
-    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-
     if (existingUser) {
-      if (existingUser.isVerified) {
-        return NextResponse.json(
-          { message: "User already exists with this email!", success: false },
-          { status: 400 }
-        );
-      } else {
-        // Update existing user's information if not verified
+      // If user exists but not verified, update their info
+      if (!existingUser.isVerified) {
         const hashedPassword = await bcryptjs.hash(password, 10);
-        existingUser.password = hashedPassword;
-        existingUser.verifyCode = verifyCode;
-        existingUser.verifyCodeExpiry = new Date(Date.now() + 3600000);
-        await existingUser.save();
+        existingUser.password = hashedPassword; // Update the password
+        existingUser.verifyCode = verifyCode; // Update verification code
+        existingUser.verifyCodeExpiry = new Date(Date.now() + 3600000); // 1 hour expiry
+        await existingUser.save(); // Save updated user data
 
         // Send verification email
-        const emailResponse = await SendVerificationEmail(
-          email,
-          username,
-          verifyCode
+        await SendVerificationEmail([email], username, verifyCode);
+
+        
+        return NextResponse.json(
+          { message: "Verification email sent to existing user!", success: true },
+          { status: 200 }
         );
+      } else {
+        return NextResponse.json(
+          { message: "User already exists and is verified!", success: false },
+          { status: 400 }
+        );
+      }
+    } else {
+      // Hash the user's password
+      const salt = await bcryptjs.genSalt(10);
+      const hashedPassword = await bcryptjs.hash(password, salt);
+      const expiryDate = new Date();
+      expiryDate.setHours(expiryDate.getHours() + 1); // 1 hour expiry
 
-        if (!emailResponse.success) {
-          return NextResponse.json(
-            { message: emailResponse.message, success: false },
-            { status: 500 }
-          );
-        }
-}
-    }
+      // Create a new user
+      const newUser = new User({
+        username,
+        email,
+        verifyCode,
+        verifyCodeExpiry: expiryDate,
+        password: hashedPassword,
+        isVerified: false,
+        isAcceptingMessage: true,
+        messages: [],
+      });
 
-    // Hash the user's password
-    const salt = await bcryptjs.genSalt(10);
-    const hashedPassword = await bcryptjs.hash(password, salt);
-    const expiryDate = new Date();
-    expiryDate.setHours(expiryDate.getHours() + 1);
+      // Save the user to the database
+      const savedUser = await newUser.save();
 
-    // Create a new user
-    const newUser = new User({
-      username,
-      email,
-      verifyCode,
-      verifyCodeExpiry: expiryDate,
-      password: hashedPassword,
-      isVerified: false,
-      isAcceptingMessage: true,
-      messages: [],
-    });
+      // Send verification email
+      await SendVerificationEmail(email, username, verifyCode);
 
-    // Save the user to the database
-    const savedUser = await newUser.save();
-
-    // Send verification email
-    const emailResponse = await SendVerificationEmail(
-      email,
-      username,
-      verifyCode
-    );
-
-    if (!emailResponse.success) {
+      // Return success response
       return NextResponse.json(
-        { message: emailResponse.message, success: false },
-        { status: 500 }
+        {
+          message: "Account created successfully! Please verify your email!",
+          success: true,
+          payload: savedUser,
+        },
+        { status: 200 }
       );
     }
-
-    // Return success response
-    return NextResponse.json(
-      {
-        message: "Account created successfully!! Please verify your email!",
-        success: true,
-        payload: savedUser,
-      },
-      { status: 200 }
-    );
   } catch (error) {
     console.error("Error registering user:", error);
 
