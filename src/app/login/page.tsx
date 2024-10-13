@@ -122,15 +122,16 @@ export default function Login() {
           {message && (
             <p className="mt-4 text-center text-green-500 text-sm">{message}</p>
           )}
-          <p className="mt-6 text-center text-gray-600 text-[2em] md:text-[1.5em]">
-            Don't have an account?{" "}
+         <p className="mt-6 text-center text-gray-600 text-[2em] md:text-[1.5em]">
+          Don't have an account?{" "}
             <Link
-              href="/register"
+               href="/register"
               className="text-blue-600 dark:text-sky-900 hover:underline"
-            >
-              Register
-            </Link>
-          </p>
+  >
+    Register
+  </Link>
+</p>
+
         </motion.div>
         <motion.div
           className="hidden md:flex justify-center items-center md:ml-[10%] lg:ml-[15%]"
