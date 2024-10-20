@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
@@ -19,9 +18,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Navbarmain />
-        {children}
+      <body
+        className={`${inter.className} bg-[#000000] bg-[radial-gradient(#ffffff33_1px,#00091d_1px)] bg-[size:20px_20px] w-screen min-h-screen overflow-y-scroll scrollbar-hide`}
+      >
+        {/* Fixed Navbar */}
+        <div className="top-0 z-10 fixed w-full">
+          <Navbarmain />
+        </div>
+
+        {/* Main content */}
+        <main >
+          {children}
+        </main>
       </body>
     </html>
   );
