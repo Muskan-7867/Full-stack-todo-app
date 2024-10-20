@@ -17,6 +17,7 @@
 body {
     @apply  text-black;
     transition: background-color 0.3s ease, color 0.3s ease;
+    
   }
   
   /* Dark Theme */
@@ -41,7 +42,14 @@ a {
 li {
     list-style: none;
 }
-
+.scrollbar-hide {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+  }
 main {
     display: flex;
     flex-direction: column;
