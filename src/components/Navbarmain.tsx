@@ -2,11 +2,15 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Cookies from "js-cookie";
-import { UserPlus, Lock, LogOut, Home } from "lucide-react"; 
+import { UserPlus, Lock, LogOut } from "lucide-react"; 
 import ThemeToggle from "./ThemeToggle";
 import { useRouter } from "next/navigation";
 
-const Navbarmain: React.FC = () => {
+interface NavbarmainProps {
+  onLogin?: () => void;
+}
+
+const Navbarmain: React.FC<NavbarmainProps> = ({ onLogin }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter();
 
@@ -23,47 +27,52 @@ const Navbarmain: React.FC = () => {
     router.push("/login");
   };
 
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    if (onLogin) {
+      onLogin(); 
+    }
+  };
+
   return (
-    <nav className="bg-blue-400 dark:bg-sky-900 p-4 w-full">
-      <div className="container mx-auto flex justify-between items-center">
+    <nav className="bg-white dark:bg-sky-900 p-4 w-full">
+      <div className="flex justify-between items-center mx-auto container">
         <div className="flex items-center space-x-4">
-          <Link href="/" className="text-white text-4xl font-bold">
+          <Link href="/" className="font-bold text-4xl text-slate-800">
             {" "}TodoApp
           </Link>
         </div>
          <div className="flex items-center space-x-4 lg:space-x-8">
-          {" "}
-         <ThemeToggle />
+          <ThemeToggle />
         
-        <div className="flex items-center space-x-4 lg:hidden">
+          <div className="flex items-center space-x-4 lg:hidden">
             {!isAuthenticated ? (
               <>
                 <Link href="/login" aria-label="Login">
-                  <Lock className="h-10 w-25 text-white  hover:text-gray-300 transition-colors duration-200" />
+                  <Lock className="w-25 h-10 text-slate-800 hover:text-gray-300 transition-colors duration-200" />
                 </Link>
                 <Link href="/register" aria-label="Register">
-                  <UserPlus className="h-10 w-25 text-white hover:text-gray-300 transition-colors duration-200" />
+                  <UserPlus className="w-25 h-10 text-slate-800 hover:text-gray-300 transition-colors duration-200" />
                 </Link>
-                </>
-            ) : (<button onClick={handleLogout} aria-label="Logout">
-                <LogOut className="h-10 w-25 text-white hover:text-gray-300 transition-colors duration-200" />
+              </>
+            ) : (
+              <button onClick={handleLogout} aria-label="Logout">
+                <LogOut className="w-25 h-10 text-slate-800 hover:text-gray-300 transition-colors duration-200" />
               </button>
             )}
           </div>
         
-          <div className="hidden lg:flex lg:items-center lg:space-x-4">  {/* Desktop View */}
-           
-{!isAuthenticated ? (  // Show buttons based on auth status 
+          <div className="lg:flex lg:items-center lg:space-x-4 hidden">  {/* Desktop View */}
+            {!isAuthenticated ? (
               <>
-          
                 <Link href="/login">
-                  <button className="bg-white dark:bg-gray-600 text-black dark:text-white text-2xl px-4 py-3 rounded-[5px] hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
-                    <Lock className="inline-block mr-2  h-6 w-10" />Login
+                  <button className="bg-slate-800 hover:bg-white dark:hover:bg-gray-600 dark:bg-gray-600 px-6 py-2 rounded-[5px] text-white text-xl hover:text-slate-800 dark:text-white transition-colors duration-200" onClick={handleLogin}>
+                    Login
                   </button>
                 </Link>
                 <Link href="/register">
-                  <button className="bg-white text-black dark:bg-gray-600 text-2xl dark:text-white px-4 py-3 rounded-[5px] transition-colors duration-200">
-                    <UserPlus className="inline-block mr-2 h-6 w-10" />
+                  <button className="bg-slate-800 hover:bg-white dark:bg-gray-600 px-6 py-2 rounded-[5px] text-white text-xl hover:text-slate-800 dark:text-white transition-colors duration-200">
+                    
                     Register
                   </button>
                 </Link>
@@ -71,13 +80,16 @@ const Navbarmain: React.FC = () => {
             ) : (
               <>
                 <button onClick={handleLogout}
-                  className="bg-white text-black dark:bg-gray-600 text-2xl dark:text-white px-4 py-3 rounded-[5px] transition-colors duration-200">
-                  <LogOut className="inline-block mr-2 h-6 w-10" />Logout</button>
+                  className="bg-slate-800 hover:bg-white -dark:bg-gray-600 px-4 py-3 rounded-[5px] text-2xl text-white hover:text-slate-800 dark:text-white transition-colors duration-200">
+                  Logout
+                </button>
               </>
             )}
           </div>
         </div>
       </div>
     </nav>
-  );};
-  export default Navbarmain;
+  );
+};
+
+export default Navbarmain;
