@@ -59,8 +59,8 @@ export default function Login() {
   // If page is still loading, show the HashLoader
   if (pageLoading) {
     return (
-      <div className="flex justify-center items-center dark:bg-gray-900 h-screen">
-        <HashLoader color="#36d7b7" size={50} />
+      <div className="flex justify-center items-center h-screen">
+        <HashLoader color="#36d7b7" size={50}  />
       </div>
     );
   }
@@ -123,7 +123,7 @@ export default function Login() {
           </button>
           {message && (
             <p
-              className={`mt-4 text-center text-sm ${
+              className={`mt-4 text-center text-md ${
                 message === "Login successful!"
                   ? "text-green-500"
                   : "text-red-500"

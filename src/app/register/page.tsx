@@ -102,8 +102,8 @@ export default function Register() {
           </button>
           {message && (
             <p
-              className={`mt-4 text-center text-sm ${
-                message === "Registration successfull!"
+              className={`mt-4 text-center text-md ${
+                message === "Registration successful!"
                   ? "text-green-500"
                   : "text-red-500"
               }`}

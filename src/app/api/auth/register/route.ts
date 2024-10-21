@@ -1,8 +1,7 @@
-import bcryptjs from 'bcryptjs';
+import bcryptjs from "bcryptjs";
 import User from "src/models/usermodel";
 import { connect } from "src/utills/db";
 import { NextRequest, NextResponse } from "next/server";
-import { SendVerificationEmail } from 'src/helpers/SendVerificationEmail';
 
 export async function POST(request) {
   await connect();
@@ -20,19 +19,9 @@ export async function POST(request) {
       // If user exists but not verified, update their info
       if (!existingUser.isVerified) {
         const hashedPassword = await bcryptjs.hash(password, 10);
-        existingUser.password = hashedPassword; // Update the password
-        existingUser.verifyCode = verifyCode; // Update verification code
-        existingUser.verifyCodeExpiry = new Date(Date.now() + 3600000); // 1 hour expiry
-        await existingUser.save(); // Save updated user data
-
-        // Send verification email
-        await SendVerificationEmail(email, username, verifyCode);
-
+        existingUser.password = hashedPassword; 
         
-        return NextResponse.json(
-          { message: "Verification email sent to existing user!", success: true },
-          { status: 200 }
-        );
+        await existingUser.save(); 
       } else {
         return NextResponse.json(
           { message: "User already exists and is verified!", success: false },
@@ -43,15 +32,13 @@ export async function POST(request) {
       // Hash the user's password
       const salt = await bcryptjs.genSalt(10);
       const hashedPassword = await bcryptjs.hash(password, salt);
-      const expiryDate = new Date();
-      expiryDate.setHours(expiryDate.getHours() + 1); // 1 hour expiry
-
+      
       // Create a new user
       const newUser = new User({
         username,
         email,
-        verifyCode,
-        verifyCodeExpiry: expiryDate,
+        
+       
         password: hashedPassword,
         isVerified: false,
         isAcceptingMessage: true,
@@ -61,13 +48,10 @@ export async function POST(request) {
       // Save the user to the database
       const savedUser = await newUser.save();
 
-      // Send verification email
-      await SendVerificationEmail(email, username, verifyCode);
-
       // Return success response
       return NextResponse.json(
         {
-          message: "Account created successfully! Please verify your email!",
+          message: "Account created successfully!!",
           success: true,
           payload: savedUser,
         },
