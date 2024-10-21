@@ -121,22 +121,22 @@ const Todos = () => {
   });
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-8 rounded-lg">
+    <div className="mx-auto p-8 rounded-lg w-full max-w-4xl">
       {loading && <p>Loading todos...</p>}
-      {error && <p className="text-red-500 font-medium">{error}</p>}
+      {error && <p className="font-medium text-red-500">{error}</p>}
       <ul className="space-y-4">
         {filteredTodos.map((todo, index) => (
           <li
             key={todo._id}
-            className={`flex items-center space-x-4 border-b text-2xl border-black pb-4 transition-all duration-300 transform ${
+            className={`flex items-center text-white space-x-4 border-b text-2xl border-white pb-4 transition-all duration-300 transform ${
               index !== todos.length - 1 ? "mb-4" : ""
             } ${todo.status === "completed" ? "opacity-50" : "opacity-100"}`}
           >
             <input
               type="checkbox"
               checked={todo.status === "completed"}
-              onChange={(e) => handleStatusChange(todo._id, e.target.checked)} // Update status on checkbox change
-              className="mr-4 mt-2 transform transition duration-200 hover:scale-110"
+              onChange={(e) => handleStatusChange(todo._id, e.target.checked)} 
+              className="mt-2 mr-4 transform transition duration-200 hover:scale-110"
               aria-label="Toggle status"
             />
 
@@ -166,10 +166,10 @@ const Todos = () => {
             <div className="flex space-x-2">
               <button
                 onClick={() => handleEditClick(todo._id)}
-                className="p-2 rounded hover:bg-blue-100"
+                className="hover:bg-blue-100 p-2 rounded"
                 aria-label="Edit todo"
               >
-                <PencilIcon className="h-6 w-6 text-blue-900 dark:text-blue-500 hover:text-blue-700" />
+                <PencilIcon className="w-6 h-6 text-blue-900 hover:text-blue-700 dark:text-blue-500" />
               </button>
 
               <TodoDelete todoId={todo._id} setTodos={setTodos} />
