@@ -8,7 +8,7 @@ async function fetchTodos(userId: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const { _id: userId } = await request.json(); // Extract user ID from the request body
+  const { _id: userId } = await request.json(); 
 
   if (!userId) {
     return NextResponse.json(
