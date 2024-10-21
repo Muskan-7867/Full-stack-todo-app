@@ -18,8 +18,10 @@ export default function Login() {
     setUser({ ...user, [e.target.name]: e.target.value });
 
   const handleLogin = async () => {
-    if (!user.email || !user.password)
-      return setMessage("Please enter both email and password.");
+    if (!user.email || !user.password) {
+      setMessage("Please enter both email and password.");
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await fetch("/api/auth/login", {
@@ -28,9 +30,14 @@ export default function Login() {
         body: JSON.stringify(user),
       });
       const data = await response.json();
-      if (!response.ok)
-        return setMessage(data.error || "Login failed. Please try again.");
-      if (!data.token) return setMessage("Your email is not verified.");
+      if (!response.ok) {
+        setMessage(data.error || "Login failed. Please try again.");
+        return;
+      }
+      if (!data.token) {
+        setMessage("Your email is not verified.");
+        return;
+      }
 
       Cookies.set("authToken", data.token, { expires: 7 });
       router.push("/");
@@ -52,33 +59,28 @@ export default function Login() {
   // If page is still loading, show the HashLoader
   if (pageLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-300">
-        <HashLoader color="#36d7b7" size={30} />
+      <div className="flex justify-center items-center dark:bg-gray-900 h-screen">
+        <HashLoader color="#36d7b7" size={50} />
       </div>
     );
   }
 
-  // Main login page content after the page finishes loading
   return (
-    <div className="flex justify-center md:justify-start items-center h-screen bg-gray-100 dark:bg-gray-300 px-4">
-      <motion.div
-        className="flex flex-col md:flex-row items-center w-full md:ml-[15%]"
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
-      >
+    <div className="flex justify-center items-center dark:bg-gray-900 min-h-screen">
+      <div className="flex md:flex-row flex-col justify-center items-center gap-[25%] mb-[20%] px-4 md:px-8 w-full max-w-screen-lg">
+        {/* Login Form */}
         <motion.div
-          className="p-8 m-6 rounded-lg shadow-lg bg-white w-full md:max-w-lg lg:max-w-xl"
+          className="flex flex-col justify-center dark:bg-gray-800 shadow-lg m-6 mx-auto p-8 rounded-lg w-[100vh] max-w-[100vw] md:max-w-lg lg:max-w-2xl min-h-[500px]" // Adjusted max width
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-5xl md:text-4xl font-bold text-sky-600 dark:text-sky-900 mb-6 text-center">
+          <h1 className="mb-6 font-bold text-5xl text-center text-sky-600 md:text-4xl dark:text-sky-400">
             Login
           </h1>
           <div className="mb-4">
             <label
-              className="block text-gray-700 text-[2em] md:text-[1.5em] font-medium mb-2"
+              className="block mb-2 font-medium text-3xl text-white dark:text-gray-300"
               htmlFor="email"
             >
               Email
@@ -90,12 +92,12 @@ export default function Login() {
               placeholder="Enter your email"
               value={user.email}
               onChange={handleChange}
-              className="w-full p-4 border text-[2em] md:text-[1.5em] border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-3 border focus:border-blue-500 rounded-lg w-full text-2xl dark:text-white focus:outline-none"
             />
           </div>
           <div className="mb-6">
             <label
-              className="block text-gray-700 text-[2em] md:text-[1.5em] font-medium mb-2"
+              className="block mb-2 font-medium text-3xl text-white dark:text-gray-300"
               htmlFor="password"
             >
               Password
@@ -107,12 +109,12 @@ export default function Login() {
               placeholder="Enter your password"
               value={user.password}
               onChange={handleChange}
-              className="w-full p-4 border text-[2em] md:text-[1.5em] border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-3 border focus:border-blue-500 rounded-lg w-full text-2xl dark:text-white focus:outline-none"
             />
           </div>
           <button
             onClick={handleLogin}
-            className={`w-full bg-blue-500 dark:bg-sky-900 text-white py-3 text-[2em] md:text-[1.5em] rounded hover:bg-blue-700 transition duration-200 ${
+            className={`w-full bg-blue-500 dark:bg-sky-900 text-white py-3 text-2xl rounded-lg hover:bg-blue-700 dark:hover:bg-sky-700 transition duration-200 ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={isLoading}
@@ -120,21 +122,30 @@ export default function Login() {
             {isLoading ? <PulseLoader color="#fff" size={10} /> : "Login"}
           </button>
           {message && (
-            <p className="mt-4 text-center text-green-500 text-sm">{message}</p>
+            <p
+              className={`mt-4 text-center text-sm ${
+                message === "Login successful!"
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+            >
+              {message}
+            </p>
           )}
-         <p className="mt-6 text-center text-gray-600 text-[2em] md:text-[1.5em]">
-          Don&apos;t have an account?{" "}
+          <p className="mt-6 text-center text-lg text-white dark:text-gray-400">
+            Don&apos;t have an account?{" "}
             <Link
-               href="/register"
-              className="text-blue-600 dark:text-sky-900 hover:underline"
-  >
-    Register
-  </Link>
-</p>
-
+              href="/register"
+              className="text-blue-600 dark:text-sky-400 hover:underline"
+            >
+              Register
+            </Link>
+          </p>
         </motion.div>
+
+        {/* Image section */}
         <motion.div
-          className="hidden md:flex justify-center items-center md:ml-[10%] lg:ml-[15%]"
+          className="md:flex justify-center items-center hidden md:ml-6 md:w-1/2 lg:w-1/3"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
@@ -142,12 +153,12 @@ export default function Login() {
           <Image
             src="/login.svg"
             alt="Login illustration"
-            width={350}
-            height={350}
-            className="lg:w-[450px] lg:h-[450px]"
+            width={800}
+            height={800}
+            className="object-contain"
           />
         </motion.div>
-      </motion.div>
+      </div>
     </div>
   );
 }
