@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} bg-[#000000] bg-[radial-gradient(#ffffff33_1px,#00091d_1px)] bg-[size:20px_20px] w-screen min-h-screen ${
+        className={`${inter.className} bg-[#000000] bg-[radial-gradient(#ffffff33_1px,#00091d_1px)] bg-[size:20px_20px]  overflow-x-hidden w-screen min-h-screen ${
           isHomePage ? "overflow-y-scroll" : "overflow-y-hidden"
         } scrollbar-hide`}
       >
