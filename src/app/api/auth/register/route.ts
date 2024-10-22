@@ -22,15 +22,15 @@ export async function POST(request) {
       if (!existingUser.isVerified) {
         const hashedPassword = await bcrypt.hash(password, 10);
         existingUser.password = hashedPassword;
-        existingUser.verifyCode = verifyCode; // Save verification code
+      
 
         await existingUser.save();
 
         // Send verification email
         await sendMail(
           email,
-          "Verify your account",
-          `Hi ${existingUser.username}, here is your verification code: ${verifyCode}`
+          "Welcome to Our Todo App!!",
+          `Hi ${existingUser.username}, Thanks for registering!!`
         );
 
         return NextResponse.json(
