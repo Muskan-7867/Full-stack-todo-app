@@ -22,6 +22,7 @@ const Todos = () => {
   const searchParams = useSearchParams();
   const filterStatus = searchParams.get("todos");
 
+  // Helper to fetch todos from the server
   const fetchTodos = async () => {
     if (!user?.userId) {
       setError("User ID is required to fetch todos.");
@@ -66,12 +67,14 @@ const Todos = () => {
     }
   };
 
+  // Run when the user is available to fetch the todos
   useEffect(() => {
     if (user?.userId) {
       fetchTodos();
     }
-  }, [user]);
+  }, [user, searchParams]); // fetch todos when user or searchParams change
 
+  // Handle status change and refetch todos after successful update
   const handleStatusChange = async (id: string, isChecked: boolean) => {
     try {
       const updatedStatus = isChecked ? "completed" : "pending"; // Determine new status
@@ -88,29 +91,23 @@ const Todos = () => {
         throw new Error(result.message || "Failed to update todo status");
       }
 
-      // Update local state after successful API response
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) =>
-          todo._id === id ? { ...todo, status: updatedStatus } : todo
-        )
-      );
+      // Refetch the todos after successful status change
+      fetchTodos();
     } catch (error: any) {
       console.error("Error updating todo status:", error);
       setError(error.message || "An error occurred while updating todo status.");
     }
   };
 
+  // Edit mode toggle
   const handleEditClick = (id: string) => {
     setEditingId(id); // Track the todo being edited
   };
 
+  // After todo update is complete, refetch todos
   const handleUpdateComplete = (id: string, updatedTask: string) => {
-    // Update the todo after editing is done
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo._id === id ? { ...todo, task: updatedTask } : todo
-      )
-    );
+    // After successful update, refetch the todos
+    fetchTodos();
     setEditingId(null); // Stop editing mode
   };
 
@@ -128,7 +125,7 @@ const Todos = () => {
         {filteredTodos.map((todo, index) => (
           <li
             key={todo._id}
-            className={`flex items-center text-white space-x-4 border-b text-2xl border-white pb-4 transition-all duration-300 transform ${
+            className={`flex items-center space-x-4 border-b text-2xl border-black pb-4 transition-all duration-300 transform ${
               index !== todos.length - 1 ? "mb-4" : ""
             } ${todo.status === "completed" ? "opacity-50" : "opacity-100"}`}
           >
