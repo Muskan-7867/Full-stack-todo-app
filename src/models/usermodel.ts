@@ -52,27 +52,27 @@ const UserSchema: MongooseSchema = new MongooseSchema(
         
       }
       ],
-      verifyCode: {
-        type: String,
-        required: false, // Change this to false, as it should be optional after verification
-        default: null, // Set default value to null
-      },
+//       verifyCode: {
+//         type: String,
+//         required: false, // Change this to false, as it should be optional after verification
+//         default: null, // Set default value to null
+//       },
       
-    verifyCodeExpiry: {
-      type: Date,
-      required: false,
-      default: null,
-},
+//     verifyCodeExpiry: {
+//       type: Date,
+//       required: false,
+//       default: null,
+// },
     
-    isVerified: {
-      type: Boolean,
-      default: false
-    },
-    isAcceptingMessages: {
-      type: Boolean,
-      default: true,
-    },
-    messages: [MessageSchema]
+//     isVerified: {
+//       type: Boolean,
+//       default: false
+//     },
+//     isAcceptingMessages: {
+//       type: Boolean,
+//       default: true,
+//     },
+//     messages: [MessageSchema]
   }
   
 );

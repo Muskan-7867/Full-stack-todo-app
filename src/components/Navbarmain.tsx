@@ -62,7 +62,7 @@ const Navbarmain: React.FC<NavbarmainProps> = ({ onLogin }) => {
             )}
           </div>
         
-          <div className="lg:flex lg:items-center lg:space-x-4 hidden">  {/* Desktop View */}
+          <div className="lg:flex lg:items-center lg:space-x-4 hidden">  
             {!isAuthenticated ? (
               <>
                 <Link href="/login">

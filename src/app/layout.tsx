@@ -24,7 +24,7 @@ export default function RootLayout({
       >
         {/* Fixed Navbar */}
         <div className="top-0 z-10 fixed w-full">
-          <Navbarmain />
+          <Navbarmain  />
         </div>
 
         <main>{children}</main>
