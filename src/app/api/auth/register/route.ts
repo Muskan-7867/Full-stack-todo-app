@@ -1,11 +1,13 @@
-import bcryptjs from "bcryptjs";
+import bcrypt from "bcryptjs"; // Correct import for bcryptjs in ES modules
 import User from "src/models/usermodel";
 import { connect } from "src/utills/db";
 import { NextRequest, NextResponse } from "next/server";
+const { sendMail } = require("src/helpers/sendMail");
 
 export async function POST(request) {
-  await connect();
+  await connect(); // Connect to the database
   try {
+    // Parse the incoming request body
     const { username, email, password } = await request.json();
     console.log("Request Body:", { username, email, password });
 
@@ -16,37 +18,52 @@ export async function POST(request) {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      // If user exists but not verified, update their info
+      // If the user exists but is not verified, update their information
       if (!existingUser.isVerified) {
-        const hashedPassword = await bcryptjs.hash(password, 10);
-        existingUser.password = hashedPassword; 
-        
-        await existingUser.save(); 
+        const hashedPassword = await bcrypt.hash(password, 10);
+        existingUser.password = hashedPassword;
+        existingUser.verifyCode = verifyCode; // Save verification code
+
+        await existingUser.save();
+
+        // Send verification email
+        await sendMail(
+          email,
+          "Verify your account",
+          `Hi ${existingUser.username}, here is your verification code: ${verifyCode}`
+        );
+
+        return NextResponse.json(
+          { message: "User updated with verification code", success: true },
+          { status: 200 }
+        );
       } else {
+        // If the user is already verified
         return NextResponse.json(
           { message: "User already exists and is verified!", success: false },
           { status: 400 }
         );
       }
     } else {
-      // Hash the user's password
-      const salt = await bcryptjs.genSalt(10);
-      const hashedPassword = await bcryptjs.hash(password, salt);
-      
-      // Create a new user
+      // If the user does not exist, hash the password and create a new user
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       const newUser = new User({
         username,
         email,
-        
-       
         password: hashedPassword,
-        isVerified: false,
-        isAcceptingMessage: true,
-        messages: [],
+        
       });
 
-      // Save the user to the database
+      // Save the new user to the database
       const savedUser = await newUser.save();
+
+      // Send welcome email
+      await sendMail(
+        email,
+        "Welcome to Our Todo App!!",
+        `Hi ${username}, thank you for registering! `
+      );
 
       // Return success response
       return NextResponse.json(
