@@ -11,8 +11,7 @@ export async function POST(request) {
     const { username, email, password } = await request.json();
     console.log("Request Body:", { username, email, password });
 
-    // Generate verification code
-    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+   
 
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
