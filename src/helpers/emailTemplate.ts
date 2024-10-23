@@ -36,7 +36,7 @@ export const EmailTemplate = (username: string) => {
             margin: 24px auto;
             padding: 12px;
             text-align: center;
-            background-color: #fff; 
+            background-color: #1e293b; 
             color: white;
             border-radius: 8px;
             font-size: 18px;
