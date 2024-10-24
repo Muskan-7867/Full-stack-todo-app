@@ -6,6 +6,8 @@ import Navbar from "src/components/Navbar";
 import Todos from "src/components/Todos";
 
 const Home: React.FC = () => {
+
+  
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="min-h-screen">
