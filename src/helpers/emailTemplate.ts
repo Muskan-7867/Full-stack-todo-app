@@ -37,14 +37,15 @@ export const EmailTemplate = (username: string, confirmationLink: string) => {
           padding: 12px;
           text-align: center;
           background-color: #1e293b;
-          color: white;
+          color: blue;
           border-radius: 8px;
           font-size: 18px;
           font-weight: bold;
           text-decoration: none;
         }
         .button:hover {
-          background-color: #38a169; /* Tailwind hover:bg-green-600 */
+          background-color: #fff;
+          color: blue
         }
         .footer {
           text-align: center;
