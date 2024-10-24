@@ -4,6 +4,7 @@ import { useCurrentUser } from "src/hooks/useCurrentUser";
 import { PencilIcon } from "@heroicons/react/24/solid";
 import TodoDelete from "./TodoDelete";
 import TodoUpdate from "./TodoUpdate";
+import getAllTodos from "src/services/getTodo";
 
 type Todo = {
   _id: string;
@@ -12,7 +13,11 @@ type Todo = {
   targetTime: string;
 };
 
-const Todos = () => {
+interface Props{
+  reRender: boolean;
+}
+
+const Todos:React.FC<Props> = ({reRender}) => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,25 +35,13 @@ const Todos = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("/api/todos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ _id: user.userId }),
-      });
+      const data = await getAllTodos(user.userId);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch todos");
-      }
-
-      if (!Array.isArray(data.payload)) {
+      if (!Array.isArray(data?.payload)) {
         throw new Error("Invalid data structure received from the server.");
       }
 
-      const todosWithValidDates = data.payload.map((todo: Todo) => {
+      const todosWithValidDates = data?.payload.map((todo: Todo) => {
         const targetTime = new Date(todo.targetTime);
         if (isNaN(targetTime.getTime())) {
           console.error("Invalid Date for Todo:", todo);
@@ -67,10 +60,13 @@ const Todos = () => {
   };
 
   useEffect(() => {
-    if (user?.userId) {
+    if (user?.userId ) {
       fetchTodos();
     }
-  }, [user]);
+
+  }, [user,reRender]);
+
+
 
   const handleStatusChange = async (id: string, isChecked: boolean) => {
     try {
@@ -96,7 +92,9 @@ const Todos = () => {
       );
     } catch (error: any) {
       console.error("Error updating todo status:", error);
-      setError(error.message || "An error occurred while updating todo status.");
+      setError(
+        error.message || "An error occurred while updating todo status."
+      );
     }
   };
 
@@ -135,7 +133,7 @@ const Todos = () => {
             <input
               type="checkbox"
               checked={todo.status === "completed"}
-              onChange={(e) => handleStatusChange(todo._id, e.target.checked)} 
+              onChange={(e) => handleStatusChange(todo._id, e.target.checked)}
               className="mt-2 mr-4 transform transition duration-200 hover:scale-110"
               aria-label="Toggle status"
             />
