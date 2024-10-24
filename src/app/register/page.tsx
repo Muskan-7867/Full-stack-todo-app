@@ -32,8 +32,8 @@ export default function Register() {
 
       const data = await response.json();
       if (response.ok) {
-        setMessage("Registration successfull! ");
-        router.push('/login');
+        setMessage("Registration successful! Please verify your mail ");
+     
       } else {
         setMessage(data.error || "Registration failed. Please try again.");
       }
