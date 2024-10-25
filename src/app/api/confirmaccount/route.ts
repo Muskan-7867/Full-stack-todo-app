@@ -1,9 +1,13 @@
+"use client"
 import jwt from 'jsonwebtoken';
 import User from "src/models/usermodel";
 import { connect } from "src/utills/db";
 import { NextResponse } from "next/server";
 
+import { useRouter } from 'next/navigation';
+
 export async function GET(request) {
+  const router = useRouter();
   await connect(); 
 
   // Get the URL and extract the token
@@ -29,17 +33,9 @@ export async function GET(request) {
     user.isVerified = true;
     await user.save();
 
-    // Redirect to the login page after successful verification
-    return NextResponse.redirect('/login'); // Redirecting to the login page
+    return NextResponse.json({ message: "Account verified successfully!", success: true }, { status: 200 });
 
   } catch (error) {
-    // Handle different JWT errors
-    if (error instanceof jwt.TokenExpiredError) {
-      return NextResponse.json({ message: "Token has expired. Please request a new verification link.", success: false }, { status: 400 });
-    } else if (error instanceof jwt.JsonWebTokenError) {
-      return NextResponse.json({ message: "Invalid token. Please try again with a valid link.", success: false }, { status: 400 });
-    } else {
-      return NextResponse.json({ message: "Something went wrong. Please try again later.", success: false }, { status: 500 });
-    }
+    return NextResponse.json({ message: "Invalid link or token expired", success: false }, { status: 400 });
   }
-}
+} 

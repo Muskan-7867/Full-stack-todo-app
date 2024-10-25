@@ -1,10 +1,12 @@
+// pages/api/register.js
 import bcryptjs from "bcryptjs";
 import User from "src/models/usermodel";
 import { connect } from "src/utills/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { EmailTemplate } from "src/helpers/emailTemplate";
 const { sendMail } = require('src/helpers/sendMail');
-const jwt = require('jsonwebtoken');
+
+import jwt from "jsonwebtoken";
 
 
 const secretKey = process.env.JWT_SECRET || 'mySecret';
@@ -27,7 +29,6 @@ export async function POST(request) {
 
         await existingUser.save(); // Save updated user data
 
-        // Return response for updated unverified user
         return NextResponse.json(
           {
             message: "User exists but was not verified, password updated!",
@@ -52,8 +53,7 @@ export async function POST(request) {
         email,
         password: hashedPassword,
         isVerified: false,
-        isAcceptingMessage: true,
-        messages: [],
+        
       });
 
       // Save the new user to the database
@@ -66,7 +66,6 @@ export async function POST(request) {
       // Send welcome email with confirmation link
       await sendMail(email, "Welcome to Our Todo App!", "", EmailTemplate(username, confirmationLink));
 
-      // Return success response for new user creation
       return NextResponse.json(
         {
           message: "Account created successfully! Please verify your email.",
@@ -79,10 +78,12 @@ export async function POST(request) {
   } catch (error) {
     console.error("Error registering user:", error);
 
-    // Return error response
     return NextResponse.json(
       { error: error.message, success: false },
       { status: 500 }
     );
   }
 }
+
+
+

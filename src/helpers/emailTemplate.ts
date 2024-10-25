@@ -37,7 +37,7 @@ export const EmailTemplate = (username: string, confirmationLink: string) => {
           padding: 12px;
           text-align: center;
           background-color: #1e293b;
-          color: blue;
+          color: white;
           border-radius: 8px;
           font-size: 18px;
           font-weight: bold;

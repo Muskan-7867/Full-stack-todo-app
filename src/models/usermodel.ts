@@ -64,15 +64,19 @@ const UserSchema: MongooseSchema = new MongooseSchema(
 //       default: null,
 // },
     
-//     isVerified: {
-//       type: Boolean,
-//       default: false
-//     },
-//     isAcceptingMessages: {
-//       type: Boolean,
-//       default: true,
-//     },
-//     messages: [MessageSchema]
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+
+    emailToken :{
+      type:String,
+    }
+    // isAcceptingMessages: {
+    //   type: Boolean,
+    //   default: true,
+    // },
+    // messages: [MessageSchema]
   }
   
 );
