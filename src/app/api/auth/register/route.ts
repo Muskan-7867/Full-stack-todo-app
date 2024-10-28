@@ -4,7 +4,7 @@ import User from "src/models/usermodel";
 import { connect } from "src/utills/db";
 import { NextResponse } from "next/server";
 import { EmailTemplate } from "src/helpers/emailTemplate";
-const { sendMail } = require('src/helpers/sendMail');
+const { sendMail } = require('../../../api/sendMail');
 
 import jwt from "jsonwebtoken";
 
