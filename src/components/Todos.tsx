@@ -13,11 +13,11 @@ type Todo = {
   targetTime: string;
 };
 
-interface Props{
+interface Props {
   reRender: boolean;
 }
 
-const Todos:React.FC<Props> = ({reRender}) => {
+const Todos: React.FC<Props> = ({ reRender }) => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -60,22 +60,50 @@ const Todos:React.FC<Props> = ({reRender}) => {
   };
 
   useEffect(() => {
-    if (user?.userId ) {
+    if (user?.userId) {
       fetchTodos();
     }
+  }, [user, reRender]);
 
-  }, [user,reRender]);
+  useEffect(() => {
+    const checkDueDates = async () => {
+      const now = new Date();
 
+      todos.forEach(async (todo) => {
+        const dueTime = new Date(todo.targetTime);
 
+        // Check if the task is pending and due within the next hour (3600000 ms)
+        if (todo.status === "pending" && dueTime.getTime() - now.getTime() < 3600000) {
+          try {
+            await fetch("src/utills/sendMail", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                to: user.email,
+                subject: "Task Due Reminder",
+                text: `Reminder: The task "${todo.task}" is due soon! Please complete it by ${new Date(todo.targetTime).toLocaleString()}.`,
+                html: `<p>Reminder: The task "<strong>${todo.task}</strong>" is due soon! Please complete it by ${new Date(todo.targetTime).toLocaleString()}.</p>`,
+              }),
+            });
+          } catch (error) {
+            console.error("Error sending reminder email:", error);
+          }
+        }
+      });
+    };
+
+    const intervalId = setInterval(checkDueDates, 15 * 60 * 1000); // Check every 15 minutes
+    return () => clearInterval(intervalId);
+  }, [todos, user]);
 
   const handleStatusChange = async (id: string, isChecked: boolean) => {
     try {
-      const updatedStatus = isChecked ? "completed" : "pending"; // Determine new status
+      const updatedStatus = isChecked ? "completed" : "pending";
       const response = await fetch("/api/update/todo", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: updatedStatus }),
       });
 
@@ -84,7 +112,6 @@ const Todos:React.FC<Props> = ({reRender}) => {
         throw new Error(result.message || "Failed to update todo status");
       }
 
-      // Update local state after successful API response
       setTodos((prevTodos) =>
         prevTodos.map((todo) =>
           todo._id === id ? { ...todo, status: updatedStatus } : todo
@@ -92,24 +119,21 @@ const Todos:React.FC<Props> = ({reRender}) => {
       );
     } catch (error: any) {
       console.error("Error updating todo status:", error);
-      setError(
-        error.message || "An error occurred while updating todo status."
-      );
+      setError(error.message || "An error occurred while updating todo status.");
     }
   };
 
   const handleEditClick = (id: string) => {
-    setEditingId(id); // Track the todo being edited
+    setEditingId(id);
   };
 
   const handleUpdateComplete = (id: string, updatedTask: string) => {
-    // Update the todo after editing is done
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
         todo._id === id ? { ...todo, task: updatedTask } : todo
       )
     );
-    setEditingId(null); // Stop editing mode
+    setEditingId(null);
   };
 
   const filteredTodos = todos.filter((todo) => {
@@ -123,58 +147,53 @@ const Todos:React.FC<Props> = ({reRender}) => {
       {loading && <p>Loading todos...</p>}
       {error && <p className="font-medium text-red-500">{error}</p>}
       <ul className="space-y-4">
-        {filteredTodos.map((todo, index) => (
-          <li
-            key={todo._id}
-            className={`flex items-center text-white space-x-4 border-b text-2xl border-white pb-4 transition-all duration-300 transform ${
-              index !== todos.length - 1 ? "mb-4" : ""
-            } ${todo.status === "completed" ? "opacity-50" : "opacity-100"}`}
-          >
-            <input
-              type="checkbox"
-              checked={todo.status === "completed"}
-              onChange={(e) => handleStatusChange(todo._id, e.target.checked)}
-              className="mt-2 mr-4 transform transition duration-200 hover:scale-110"
-              aria-label="Toggle status"
-            />
+  {filteredTodos.map((todo, index) => (
+    <li
+      key={todo._id}
+      className={`flex items-center text-white space-x-4 border-b text-2xl border-white pb-4 transition-all duration-300 transform ${
+        index !== todos.length - 1 ? "mb-4" : ""
+      } ${todo.status === "completed" ? "opacity-50" : "opacity-100"}`}
+    >
+      <input
+        type="checkbox"
+        checked={todo.status === "completed"}
+        onChange={(e) => handleStatusChange(todo._id, e.target.checked)}
+        className="mt-2 mr-4 transform transition duration-200 hover:scale-110"
+        aria-label="Toggle status"
+      />
+      {editingId === todo._id ? (
+        <TodoUpdate
+          todoId={todo._id}
+          task={todo.task}
+          targetTime={todo.targetTime}
+          status={todo.status}
+          setTodos={setTodos}
+          onComplete={handleUpdateComplete}
+          
 
-            {editingId === todo._id ? (
-              <TodoUpdate
-                todoId={todo._id}
-                task={todo.task}
-                targetTime={todo.targetTime}
-                status={todo.status}
-                setTodos={setTodos}
-                onComplete={handleUpdateComplete} // Pass the completion handler
-              />
-            ) : (
-              <span
-                className={`flex-grow ${
-                  todo.status === "completed" ? "line-through" : ""
-                }`}
-              >
-                {todo.task}
-                <span className="text-gray-500">
-                  {" "}
-                  (Due: {new Date(todo.targetTime).toLocaleString()})
-                </span>
-              </span>
-            )}
+        />
+      ) : (
+        <span className={`flex-grow ${todo.status === "completed" ? "line-through" : ""}`}>
+          {todo.task}
+          <span className="ml-2 text-gray-400 text-xl">
+            Due: {new Date(todo.targetTime).toLocaleString()} {/* Display targetTime */}
+          </span>
+        </span>
+      )}
+      {/* Wrapper for icons with added margin */}
+      <span className="flex items-center space-x-3 ml-4">
+        <PencilIcon
+          onClick={() => handleEditClick(todo._id)}
+          className="w-5 h-5 cursor-pointer"
+          aria-label="Edit Todo"
+        />
+        <TodoDelete todoId={todo._id} setTodos={setTodos} />
+      </span>
+    </li>
+  ))}
+</ul>
 
-            <div className="flex space-x-2">
-              <button
-                onClick={() => handleEditClick(todo._id)}
-                className="hover:bg-blue-100 p-2 rounded"
-                aria-label="Edit todo"
-              >
-                <PencilIcon className="w-6 h-6 text-blue-900 hover:text-blue-700 dark:text-blue-500" />
-              </button>
 
-              <TodoDelete todoId={todo._id} setTodos={setTodos} />
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
