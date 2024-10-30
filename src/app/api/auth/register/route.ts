@@ -1,13 +1,11 @@
-// pages/api/register.js
+// src/app/auth/register/register.js
 import bcryptjs from "bcryptjs";
-import User from "src/models/usermodel";
+import User from "src/models/usermodel"; 
 import { connect } from "src/utills/db";
 import { NextResponse } from "next/server";
-import { EmailTemplate } from "src/helpers/emailTemplate";
-const { sendMail } = require('../../../api/sendMail');
-
+import { EmailTemplate } from "src/helpers/emailTemplate"; 
+const  { sendMail }  = require('src/utills/api/sendMail')
 import jwt from "jsonwebtoken";
-
 
 const secretKey = process.env.JWT_SECRET || 'mySecret';
 
@@ -53,7 +51,6 @@ export async function POST(request) {
         email,
         password: hashedPassword,
         isVerified: false,
-        
       });
 
       // Save the new user to the database
@@ -84,6 +81,3 @@ export async function POST(request) {
     );
   }
 }
-
-
-
