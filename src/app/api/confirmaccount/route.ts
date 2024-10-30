@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 import { useRouter } from 'next/navigation';
 
 export async function GET(request) {
-  const router = useRouter();
+  
   await connect(); 
 
   // Get the URL and extract the token
