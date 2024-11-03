@@ -39,17 +39,17 @@ const TodoUpdate = ({ todoId, task, targetTime, status, setTodos, onComplete }: 
  
 
   return (
-    <form onSubmit={handleUpdate} className="flex  w-[80%]">
+    <form onSubmit={handleUpdate} className="flex w-[80%]">
       <input
         type="text"
         value={updatedTask}
         onChange={(e) => setUpdatedTask(e.target.value)}
         
-        className="border border-b-black rounded p-2"
+        className="p-2 border border-b-black rounded text-black"
         required
       />
 
-      <button type="submit" className="bg-blue-500 text-white p-2 h-12 mt-[10%] rounded flex items-center justify-center">
+      <button type="submit" className="flex justify-center items-center bg-blue-500 mt-[10%] p-2 rounded h-12 text-white">
         Save
       </button>
     </form>
