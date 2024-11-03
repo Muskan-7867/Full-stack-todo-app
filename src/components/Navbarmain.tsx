@@ -15,20 +15,22 @@ const Navbarmain: React.FC<NavbarmainProps> = ({ onLogin }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = Cookies.get("authToken");
-      setIsAuthenticated(!!token); 
-    }
+    // Check for the auth token and update authentication state
+    const token = Cookies.get("authToken");
+    setIsAuthenticated(!!token); 
   }, []);
 
   const handleLogout = () => {
     Cookies.remove("authToken");
-    setIsAuthenticated(false);
+    setIsAuthenticated(false);  // Update state immediately
     router.push("/login");
   };
 
+  // This is just a placeholder function for login; replace with your actual login logic
   const handleLogin = () => {
-    setIsAuthenticated(true);
+    Cookies.set("authToken", "your_token_here");  // Set token on actual login
+    setIsAuthenticated(true);  // Update state immediately after login
+    router.push("/");  // Redirect after successful login
     if (onLogin) {
       onLogin(); 
     }
@@ -39,10 +41,10 @@ const Navbarmain: React.FC<NavbarmainProps> = ({ onLogin }) => {
       <div className="flex justify-between items-center mx-auto container">
         <div className="flex items-center space-x-4">
           <Link href="/" className="font-bold text-4xl text-slate-800">
-            {" "}TodoApp
+            TodoApp
           </Link>
         </div>
-         <div className="flex items-center space-x-4 lg:space-x-8">
+        <div className="flex items-center space-x-4 lg:space-x-8">
           <ThemeToggle />
         
           <div className="flex items-center space-x-4 lg:hidden">
@@ -66,24 +68,21 @@ const Navbarmain: React.FC<NavbarmainProps> = ({ onLogin }) => {
             {!isAuthenticated ? (
               <>
                 <Link href="/login">
-                  <button className="bg-slate-800 hover:bg-white dark:hover:bg-gray-600 dark:bg-gray-600 px-6 py-2 rounded-[5px] text-white text-xl hover:text-slate-800 dark:text-white transition-colors duration-200" onClick={handleLogin}>
+                  <button className="bg-slate-800 hover:bg-white dark:hover:bg-gray-600 dark:bg-gray-600 px-6 py-2 rounded-[5px] text-white text-xl hover:text-slate-800 dark:text-white transition-colors duration-200">
                     Login
                   </button>
                 </Link>
                 <Link href="/register">
                   <button className="bg-slate-800 hover:bg-white dark:bg-gray-600 px-6 py-2 rounded-[5px] text-white text-xl hover:text-slate-800 dark:text-white transition-colors duration-200">
-                    
                     Register
                   </button>
                 </Link>
               </>
             ) : (
-              <>
-                <button onClick={handleLogout}
-                  className="bg-slate-800 hover:bg-white -dark:bg-gray-600 px-4 py-3 rounded-[5px] text-2xl text-white hover:text-slate-800 dark:text-white transition-colors duration-200">
-                  Logout
-                </button>
-              </>
+              <button onClick={handleLogout}
+                className="bg-slate-800 hover:bg-white dark:bg-gray-600 px-4 py-3 rounded-[5px] text-2xl text-white hover:text-slate-800 dark:text-white transition-colors duration-200">
+                Logout
+              </button>
             )}
           </div>
         </div>
