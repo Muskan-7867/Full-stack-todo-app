@@ -5,7 +5,7 @@ import { connect } from "src/utills/db";
 import { NextResponse } from "next/server";
 import { EmailTemplate } from "src/helpers/emailTemplate"; 
 const  { sendMail }  = require('src/utills/api/sendMail')
-import jwt from "jsonwebtoken";
+
 
 const secretKey = process.env.JWT_SECRET || 'mySecret';
 
@@ -56,16 +56,15 @@ export async function POST(request) {
       // Save the new user to the database
       const savedUser = await newUser.save();
 
-      // Generate a confirmation link
-      const confirmationToken = jwt.sign({ userId: savedUser._id }, secretKey, { expiresIn: '1d' });
-      const confirmationLink = `http://localhost:3000/api/confirmaccount?token=${encodeURIComponent(confirmationToken)}`;
+
+     
 
       // Send welcome email with confirmation link
-      await sendMail(email, "Welcome to Our Todo App!", "", EmailTemplate(username, confirmationLink));
+      await sendMail(email, "Welcome to Our Todo App!", "", EmailTemplate(username));
 
       return NextResponse.json(
         {
-          message: "Account created successfully! Please verify your email.",
+          message: "Account created successfully!",
           success: true,
           payload: savedUser,
         },

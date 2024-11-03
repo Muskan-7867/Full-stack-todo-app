@@ -1,4 +1,4 @@
-export const EmailTemplate = (username: string, confirmationLink: string) => {
+export const EmailTemplate = (username: string) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -64,14 +64,9 @@ export const EmailTemplate = (username: string, confirmationLink: string) => {
           <p class="body-text">
             Thank you for choosing our Todo App! We’re excited to have you on board and can’t wait to help you stay organized and productive. Whether you're managing your daily tasks or tracking long-term goals, we’re here to assist you every step of the way.
           </p>
-          <p class="body-text">
-            To get started and confirm your account, please click the button below:
-          </p>
+          
   
-          <!-- Confirmation Button with Link -->
-          <a href="${confirmationLink}" class="button">
-            Confirm Your Account
-          </a>
+         
   
           <p class="body-text">
             If you have any questions or need assistance, feel free to reply to this email. We're here to help!
