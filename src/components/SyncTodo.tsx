@@ -1,7 +1,16 @@
+// src/utils/SyncTodo.ts
+
 import { clearLocalStorageTodos, getTodosFromLocalStorage } from "src/utills/localstorage";
 
-export const syncLocalTodosToDatabase = async () => {
+export const syncLocalTodosToDatabase = async (userId: string) => {
   const localTodos = getTodosFromLocalStorage(); // Retrieve locally stored todos
+
+  // Check if localTodos have already been synced
+  const alreadySynced = localStorage.getItem("todos_synced");
+  if (alreadySynced) {
+    console.log("Todos already synced.");
+    return;
+  }
 
   if (localTodos && localTodos.length > 0) {
     try {
@@ -12,7 +21,7 @@ export const syncLocalTodosToDatabase = async () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(todo), // Send each todo
+          body: JSON.stringify({ ...todo, userId }), // Attach userId to each todo
         });
 
         const data = await response.json();
@@ -23,6 +32,7 @@ export const syncLocalTodosToDatabase = async () => {
       }
 
       clearLocalStorageTodos(); // Clear synced todos from local storage
+      localStorage.setItem("todos_synced", "true"); // Set synced flag to prevent future syncs
       console.log("Todos synced successfully from local storage!");
     } catch (error: any) {
       console.error("Error syncing local todos:", error.message);
