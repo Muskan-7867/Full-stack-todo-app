@@ -22,11 +22,12 @@ const Navbarmain: React.FC<NavbarmainProps> = ({ onLogin }) => {
 
   const handleLogout = () => {
     Cookies.remove("authToken");
+    localStorage.removeItem("todos_synced"); // Clear the synced flag on logout
     setIsAuthenticated(false);  // Update state immediately
     router.push("/login");
   };
 
-  // This is just a placeholder function for login; replace with your actual login logic
+  // Placeholder function for login; replace with actual login logic
   const handleLogin = () => {
     Cookies.set("authToken", "your_token_here");  // Set token on actual login
     setIsAuthenticated(true);  // Update state immediately after login
