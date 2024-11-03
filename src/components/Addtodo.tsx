@@ -1,20 +1,19 @@
-"use client";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { saveTodoToLocalStorage } from "src/utills/localstorage"; // Adjust path
-import { useCurrentUser } from "src/hooks/useCurrentUser"; // Adjust path
+import { saveTodoToLocalStorage } from "src/utills/localstorage";
+import { useCurrentUser } from "src/hooks/useCurrentUser";
 import { syncLocalTodosToDatabase } from "./SyncTodo";
 import { SyncLoader } from "react-spinners";
 import addTodo from "src/services/addTodo";
-import getAllTodos from "src/services/getTodo";
 
 type TodoForm = {
   task: string;
   userId: string | "" | undefined | null;
 };
+
 const getUserIsLoggedIn = () => {
-  const authCookie = Cookies.get("authToken"); // Assuming 'authToken' is the cookie name
-  return !!authCookie; // Returns true if the cookie exists, otherwise false
+  const authCookie = Cookies.get("authToken");
+  return !!authCookie;
 };
 
 interface Props {
@@ -33,23 +32,23 @@ const AddTodo: React.FC<Props> = ({ setReRender }) => {
   });
 
   useEffect(() => {
-    console.log("user ", user, isAuthenticated);
     setForm((prevForm) => ({
       ...prevForm,
       userId: user?.userId || "",
     }));
-  }, [user, isAuthenticated]);
+  }, [user]);
 
   useEffect(() => {
-    if (getUserIsLoggedIn()) {
-      syncLocalTodosToDatabase(); // Call the separated sync function
+    if (isAuthenticated && user?.userId) {
+      syncLocalTodosToDatabase(user.userId); // Sync todos to DB on login
     }
-  }, [user]); // Trigger sync when the user is logged in
+  }, [isAuthenticated, user]);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
       task: e.target.value,
-      userId: user?.userId || "", // Ensure userId is updated
+      userId: user?.userId || "",
     });
   };
 
@@ -64,11 +63,10 @@ const AddTodo: React.FC<Props> = ({ setReRender }) => {
         saveTodoToLocalStorage({ task: form.task, status: "pending" });
         setSuccessMessage("Todo saved locally! Will sync when you log in.");
       } else {
-        const response = await addTodo(form);
-
+        await addTodo(form);
         setReRender((prev) => !prev);
       }
-      setForm({ task: "", userId: user?.userId || "" }); // Reset form and maintain userId
+      setForm({ task: "", userId: user?.userId || "" });
     } catch (error: any) {
       setError(error.message || "Something went wrong.");
     } finally {
@@ -95,7 +93,7 @@ const AddTodo: React.FC<Props> = ({ setReRender }) => {
         <button
           type="submit"
           disabled={loading}
-          className={`py-4 px-6 sm:px-4  md:px-8 border-0 rounded-sm font-bold cursor-pointer mt-4 sm:mt-0 bg-sky-600 dark:bg-sky-900 text-white transform transition duration-300 ${
+          className={`py-4 px-6 sm:px-4 md:px-8 border-0 rounded-sm font-bold cursor-pointer mt-4 sm:mt-0 ${
             loading
               ? "bg-blue-400 cursor-not-allowed"
               : "bg-green-600 hover:bg-sky-700 hover:scale-105 active:scale-95"
@@ -104,11 +102,7 @@ const AddTodo: React.FC<Props> = ({ setReRender }) => {
           {loading ? <SyncLoader size={5} color="#fff" /> : "Add Todo"}
         </button>
       </form>
-      {error && (
-        <p className="mt-6 font-medium text-red-500 animate-fade-in">
-          {error}{" "}
-        </p>
-      )}
+      {error && <p className="mt-6 font-medium text-red-500 animate-fade-in">{error}</p>}
       {successMessage && (
         <p className="mt-6 text-2xl text-center text-sky-500 dark:text-sky-900 animate-fade-in">
           {successMessage}
@@ -118,4 +112,5 @@ const AddTodo: React.FC<Props> = ({ setReRender }) => {
     </div>
   );
 };
+
 export default AddTodo;
